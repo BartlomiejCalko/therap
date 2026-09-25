@@ -18,6 +18,7 @@ import { useTheme } from '@/theme/theme';
 import { radius, space, TAB_BAR_SPACE } from '@/theme/tokens';
 
 import { Icon, type IconName } from './Icon';
+import { PaperTexture } from './PaperTexture';
 import { T } from './T';
 
 // ---------- Layout ----------
@@ -26,6 +27,7 @@ export function Screen({
   children,
   scroll = true,
   withTabBar = false,
+  texture = false,
   contentStyle,
   edges = ['top'],
   ...scrollProps
@@ -33,6 +35,7 @@ export function Screen({
   children: ReactNode;
   scroll?: boolean;
   withTabBar?: boolean;
+  texture?: boolean;
   contentStyle?: StyleProp<ViewStyle>;
   edges?: ('top' | 'bottom')[];
 } & ScrollViewProps) {
@@ -40,6 +43,7 @@ export function Screen({
   const bottom = withTabBar ? TAB_BAR_SPACE : space.xl;
   return (
     <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: c.bg }}>
+      {texture && <PaperTexture />}
       {scroll ? (
         <ScrollView
           {...scrollProps}

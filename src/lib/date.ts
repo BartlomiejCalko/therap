@@ -25,7 +25,7 @@ export const monthShort = (m: number) => MONTHS[m].slice(0, 3);
 
 export function greeting(date = new Date()) {
   const h = date.getHours();
-  if (h < 5) return 'Good night';
+  if (h < 5) return 'Hello';
   if (h < 12) return 'Good morning';
   if (h < 18) return 'Good afternoon';
   return 'Good evening';

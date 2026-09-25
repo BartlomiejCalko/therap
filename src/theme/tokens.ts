@@ -14,6 +14,10 @@ export type Palette = {
   shadow: string;
   // Tonal paper for cards — the text-only answer to Cosmos's image grid.
   tones: [string, string, string, string];
+  // Four washed-out pastels, used sparingly on Today.
+  pastel: { peach: string; lavender: string; sage: string; mist: string };
+  // Soft surface laid over pastel cards (for small round buttons).
+  veil: string;
 };
 
 export const palettes: Record<'light' | 'dark', Palette> = {
@@ -30,6 +34,8 @@ export const palettes: Record<'light' | 'dark', Palette> = {
     scrim: 'rgba(20,19,17,0.28)',
     shadow: '#3A352C',
     tones: ['#FBFAF7', '#ECE8E0', '#E3E6E0', '#E7E4EA'],
+    pastel: { peach: '#F4E5DA', lavender: '#E8E4F2', sage: '#E1E9DE', mist: '#DDE7EE' },
+    veil: 'rgba(255,255,255,0.6)',
   },
   dark: {
     bg: '#121110',
@@ -44,6 +50,8 @@ export const palettes: Record<'light' | 'dark', Palette> = {
     scrim: 'rgba(0,0,0,0.5)',
     shadow: '#000000',
     tones: ['#1C1B19', '#23211E', '#1D201D', '#211F24'],
+    pastel: { peach: '#2A2320', lavender: '#24222C', sage: '#1F2620', mist: '#1D2429' },
+    veil: 'rgba(255,255,255,0.07)',
   },
 };
 

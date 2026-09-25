@@ -45,7 +45,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "sounds": "node ./scripts/generate-sounds.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "paper": "node ./scripts/generate-paper.mjs"
   },
   "private": true
 }
