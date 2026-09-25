@@ -17,13 +17,29 @@ export const DAY_PART_LABEL: Record<DayPart, string> = {
   night: 'Night',
 };
 
-// Photos for the Today window. Add one or more per part of the day, e.g.
-//   morning: [require('@/assets/window/morning-1.jpg')],
-// `ink` says which text colour reads best on the upper part of the photo.
-// Until a part has photos, the window paints its own landscape.
-export const DAY_WINDOW_PHOTOS: Partial<
-  Record<DayPart, { source: ImageSourcePropType; ink: 'dark' | 'light' }[]>
-> = {};
+export type WindowPhoto = {
+  source: ImageSourcePropType;
+  // Which text colour reads best on the photo.
+  ink: 'dark' | 'light';
+  // Width divided by height of the original image.
+  aspect: number;
+  // Which part stays in frame when the photo is cropped: 0 = top/left, 1 = bottom/right.
+  focus?: { x?: number; y?: number };
+};
+
+// Photos for the Today window, one or more per part of the day.
+// A part without photos keeps its painted landscape.
+export const DAY_WINDOW_PHOTOS: Partial<Record<DayPart, WindowPhoto[]>> = {
+  night: [
+    {
+      source: require('@/assets/window/night-1.jpg'),
+      ink: 'light',
+      aspect: 1345 / 2400,
+      // Keeps the figure's head and the moons in frame.
+      focus: { y: 0.2 },
+    },
+  ],
+};
 
 type Scene = {
   sky: [string, string];

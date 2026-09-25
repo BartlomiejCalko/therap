@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
@@ -16,6 +16,7 @@ import {
   SCENES,
   dayPart,
   type DayPart,
+  type WindowPhoto,
 } from '@/content/dayWindow';
 import { timeOfDay } from '@/lib/date';
 import { useTheme } from '@/theme/theme';
@@ -138,6 +139,35 @@ function PaintedScene({ part }: { part: DayPart }) {
   );
 }
 
+// Fills the card like `cover`, but keeps the photo's focus point in frame instead of its centre.
+function PhotoLayer({ photo, width }: { photo: WindowPhoto; width: number }) {
+  if (!width) return null;
+  const scale = Math.max(width / photo.aspect, HEIGHT);
+  const w = photo.aspect * scale;
+  const h = scale;
+  const left = -(w - width) * (photo.focus?.x ?? 0.5);
+  const top = -(h - HEIGHT) * (photo.focus?.y ?? 0.5);
+  return <Image source={photo.source} style={{ position: 'absolute', width: w, height: h, left, top }} />;
+}
+
+// Darkens (or lightens) the top and foot of a photo so the greeting and subtitle stay readable.
+function PhotoScrim({ ink }: { ink: 'dark' | 'light' }) {
+  const tint = ink === 'light' ? '#000' : '#FFF';
+  return (
+    <Svg pointerEvents="none" style={StyleSheet.absoluteFill} width="100%" height="100%">
+      <Defs>
+        <LinearGradient id="window-scrim" x1="0" y1="0" x2="0" y2="1">
+          <Stop offset="0" stopColor={tint} stopOpacity={0.45} />
+          <Stop offset="0.45" stopColor={tint} stopOpacity={0} />
+          <Stop offset="0.62" stopColor={tint} stopOpacity={0} />
+          <Stop offset="1" stopColor={tint} stopOpacity={0.7} />
+        </LinearGradient>
+      </Defs>
+      <Rect x="0" y="0" width="100%" height="100%" fill="url(#window-scrim)" />
+    </Svg>
+  );
+}
+
 // The Today window: a scene for the current part of the day, with the greeting in its sky.
 export function DayWindow({ now, title, subtitle }: { now: Date; title: string; subtitle: string }) {
   const { c, scheme } = useTheme();
@@ -147,48 +177,48 @@ export function DayWindow({ now, title, subtitle }: { now: Date; title: string; 
   const photo = photos.length ? photos[Math.floor(now.getTime() / 86_400_000) % photos.length] : null;
   const ink = photo ? photo.ink : SCENES[part].ink;
   const text = TEXT[ink];
+  // Photos are busier than the painted sky, so text gets a soft halo there.
+  const halo = photo
+    ? {
+        textShadowColor: ink === 'light' ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.6)',
+        textShadowRadius: 14,
+        textShadowOffset: { width: 0, height: 1 },
+      }
+    : null;
 
+  const [width, setWidth] = useState(0);
   const breathe = useSway(28000);
   const zoom = useAnimatedStyle(() => ({ transform: [{ scale: 1 + breathe.value * 0.045 }] }));
 
   return (
     <View
       accessibilityRole="header"
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
       style={[styles.card, { borderColor: c.hairline, backgroundColor: SCENES[part].sky[1] }]}>
       <Animated.View style={[StyleSheet.absoluteFill, zoom]}>
         {photo ? (
-          <Image source={photo.source} resizeMode="cover" style={StyleSheet.absoluteFill} />
+          <PhotoLayer photo={photo} width={width} />
         ) : (
           <PaintedScene part={part} />
         )}
       </Animated.View>
 
-      {photo && (
-        <Svg pointerEvents="none" style={StyleSheet.absoluteFill} width="100%" height="100%">
-          <Defs>
-            <LinearGradient id="window-scrim" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0" stopColor={ink === 'light' ? '#000' : '#FFF'} stopOpacity={0.38} />
-              <Stop offset="0.6" stopColor={ink === 'light' ? '#000' : '#FFF'} stopOpacity={0} />
-            </LinearGradient>
-          </Defs>
-          <Rect x="0" y="0" width="100%" height="100%" fill="url(#window-scrim)" />
-        </Svg>
-      )}
+      {photo && <PhotoScrim ink={ink} />}
 
-      <PaperTexture tone={ink === 'light' ? 'chalk' : 'ink'} opacity={ink === 'light' ? 0.3 : 0.7} />
+      <PaperTexture tone={ink === 'light' ? 'chalk' : 'ink'} opacity={photo ? 0.2 : ink === 'light' ? 0.3 : 0.7} />
       {scheme === 'dark' && ink === 'dark' && (
         <View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(18,17,16,0.16)' }]} />
       )}
 
       <View style={styles.text}>
-        <T variant="label" style={{ color: text.faint }}>
+        <T variant="label" style={[{ color: photo ? text.soft : text.faint }, halo]}>
           {DAY_PART_LABEL[part]} · {timeOfDay(now.getTime())}
         </T>
-        <T variant="display" style={[styles.title, { color: text.ink }]}>
+        <T variant="display" style={[styles.title, { color: text.ink }, halo]}>
           {title}
         </T>
       </View>
-      <T variant="italic" style={[styles.subtitle, { color: text.ink }]}>
+      <T variant="italic" style={[styles.subtitle, { color: text.ink }, halo, photo && { opacity: 1 }]}>
         {subtitle}
       </T>
     </View>
