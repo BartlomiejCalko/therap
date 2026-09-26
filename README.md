@@ -26,6 +26,20 @@ Scan the QR code with Expo Go on a phone, or press `w` for the web preview.
 - `scripts/generate-sounds.mjs` — synthesises the three focus-sound loops (`npm run sounds`)
 - `scripts/generate-paper.mjs` — generates the washi paper grain in `assets/textures` (`npm run paper`)
 
+## Languages
+
+The interface follows the device language (`expo-localization`): the first of the person's preferred
+languages that Unload supports, otherwise English. Supported now: English (default) and Polish.
+Planned: German, French, Spanish, Norwegian.
+
+- `src/i18n/en.ts` is the source of truth; every other dictionary is typed as `Dict`, so a missing
+  string is a type error. Plural rules live in `src/i18n/plural.ts`.
+- To add a language: create `src/i18n/<code>.ts`, register it in `DICTS` in `src/i18n/index.tsx`,
+  add a plural helper if needed, and add the code to `supportedLocales` for `expo-localization` in
+  `app.json` (this also enables the per-app language setting on iOS/Android).
+- Web preview only, in development: add `?lang=pl` to the URL to see a language without changing the
+  browser's.
+
 ## Today window
 
 The window at the top of Today paints a pastel landscape for the part of the day (morning 5–11,

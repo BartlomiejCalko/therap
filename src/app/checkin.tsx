@@ -4,13 +4,15 @@ import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'rea
 
 import { T } from '@/components/T';
 import { CircleButton, FadeIn, PillButton, Screen, TopBar } from '@/components/ui';
-import { stateLabel, type CheckinState } from '@/content/copy';
+import { type CheckinState } from '@/content/copy';
+import { useT } from '@/i18n';
 import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
 import { fonts, space } from '@/theme/tokens';
 
 export default function Checkin() {
   const { c } = useTheme();
+  const t = useT();
   const { addCheckin } = useStore();
   const { state } = useLocalSearchParams<{ state: CheckinState }>();
   const [name, setName] = useState('');
@@ -23,25 +25,25 @@ export default function Checkin() {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Screen scroll={false} edges={['top', 'bottom']}>
-        <TopBar left={<CircleButton icon="back" label="Back" onPress={() => router.back()} />} />
+        <TopBar left={<CircleButton icon="back" label={t.common.back} onPress={() => router.back()} />} />
 
         <View style={styles.body}>
           <FadeIn>
-            <T variant="label">What brings you here now</T>
+            <T variant="label">{t.checkin.label}</T>
             <T variant="display" style={{ marginTop: space.md }}>
-              “{stateLabel(state)}”
+              “{t.states[state]}”
             </T>
           </FadeIn>
 
           <FadeIn delay={350} style={{ marginTop: space.xxl }}>
             <T variant="serif" tone="soft">
-              If it had a name, what would it be?
+              {t.checkin.question}
             </T>
             <TextInput
               value={name}
               onChangeText={setName}
               autoFocus
-              placeholder="one word or a few is enough"
+              placeholder={t.checkin.placeholder}
               placeholderTextColor={c.inkFaint}
               returnKeyType="next"
               onSubmitEditing={() => next(true)}
@@ -51,8 +53,8 @@ export default function Checkin() {
         </View>
 
         <View style={styles.actions}>
-          <PillButton title="Skip" kind="secondary" onPress={() => next(false)} grow />
-          <PillButton title="Forward" icon="arrow" onPress={() => next(true)} disabled={!name.trim()} grow />
+          <PillButton title={t.common.skip} kind="secondary" onPress={() => next(false)} grow />
+          <PillButton title={t.checkin.forward} icon="arrow" onPress={() => next(true)} disabled={!name.trim()} grow />
         </View>
       </Screen>
     </KeyboardAvoidingView>

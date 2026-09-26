@@ -5,6 +5,7 @@ import { StyleSheet, TextInput, View } from 'react-native';
 import { CaptureCard, estimateCapture } from '@/components/Cards';
 import { T } from '@/components/T';
 import { Chip, Masonry, PillButton, Screen, SectionLabel, Sheet } from '@/components/ui';
+import { useT } from '@/i18n';
 import { dayLabel, groupByDay } from '@/lib/date';
 import { done } from '@/lib/haptics';
 import { useStore } from '@/store/store';
@@ -17,6 +18,7 @@ const MAX = 280;
 
 export default function CaptureTab() {
   const { c } = useTheme();
+  const t = useT();
   const { data, addCapture, deleteCapture } = useStore();
   const [draft, setDraft] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
@@ -39,38 +41,38 @@ export default function CaptureTab() {
   return (
     <Screen withTabBar contentStyle={{ paddingTop: space.lg }}>
       <T variant="title" center>
-        Capture
+        {t.capture.title}
       </T>
       <T variant="small" tone="faint" center style={{ marginTop: space.xs, paddingHorizontal: space.lg }}>
-        Save a thought before it slips away. Come back to it when you&apos;re ready to explore it further.
+        {t.capture.intro}
       </T>
 
       <View style={[styles.composer, { backgroundColor: c.surface, borderColor: c.hairline }]}>
-        <T variant="label">Write one thought or sentence</T>
+        <T variant="label">{t.capture.label}</T>
         <TextInput
           value={draft}
           onChangeText={setDraft}
           multiline
           maxLength={MAX}
-          placeholder="It keeps coming back that…"
+          placeholder={t.capture.placeholder}
           placeholderTextColor={c.inkFaint}
           style={[styles.input, { color: c.ink }]}
         />
         <View style={styles.composerFoot}>
           <T variant="label" tone={savedFlash ? 'ink' : 'faint'}>
-            {savedFlash ? 'Saved for later' : `${draft.length} / ${MAX}`}
+            {savedFlash ? t.capture.saved : `${draft.length} / ${MAX}`}
           </T>
-          <PillButton title="Save" onPress={save} disabled={!draft.trim()} style={{ height: 40 }} />
+          <PillButton title={t.common.save} onPress={save} disabled={!draft.trim()} style={{ height: 40 }} />
         </View>
       </View>
 
-      <SectionLabel>For later</SectionLabel>
+      <SectionLabel>{t.capture.forLater}</SectionLabel>
       <View style={styles.filters}>
         {(['all', 'waiting', 'explored'] as Filter[]).map((f) => (
           <Chip
             key={f}
             size="sm"
-            label={f === 'all' ? 'All' : f === 'waiting' ? 'Waiting' : 'Explored'}
+            label={t.capture[f]}
             selected={filter === f}
             onPress={() => setFilter(f)}
           />
@@ -79,13 +81,13 @@ export default function CaptureTab() {
 
       {groups.length === 0 ? (
         <T variant="italic" tone="faint" center style={{ marginTop: space.xl, fontSize: 17 }}>
-          Nothing here yet.
+          {t.capture.empty}
         </T>
       ) : (
         groups.map((g) => (
           <View key={g.key} style={{ marginTop: space.lg }}>
             <T variant="heading" style={{ marginBottom: space.md }}>
-              {dayLabel(g.time)}
+              {dayLabel(g.time, t.dates)}
             </T>
             <Masonry
               items={g.items}
@@ -103,7 +105,7 @@ export default function CaptureTab() {
         ))
       )}
 
-      <Sheet visible={!!menu} onClose={() => setMenu(null)} title="This thought">
+      <Sheet visible={!!menu} onClose={() => setMenu(null)} title={t.capture.sheetTitle}>
         {menu && (
           <View style={{ gap: 10 }}>
             <T variant="italic" center style={{ marginBottom: space.md }}>
@@ -111,7 +113,7 @@ export default function CaptureTab() {
             </T>
             {menu.status === 'waiting' && (
               <PillButton
-                title="Unload this"
+                title={t.capture.unloadThis}
                 icon="arrow"
                 onPress={() => {
                   const target = menu;
@@ -121,7 +123,7 @@ export default function CaptureTab() {
               />
             )}
             <PillButton
-              title="Delete"
+              title={t.common.delete}
               kind="secondary"
               onPress={() => {
                 deleteCapture(menu.id);

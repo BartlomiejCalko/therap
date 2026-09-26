@@ -37,7 +37,22 @@
         }
       ],
       "expo-audio",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": {
+            "ios": [
+              "en",
+              "pl"
+            ],
+            "android": [
+              "en",
+              "pl"
+            ]
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false,

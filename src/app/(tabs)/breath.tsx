@@ -5,7 +5,8 @@ import { useIsFocused } from 'expo-router';
 import { BreathCircle } from '@/components/Breath';
 import { T } from '@/components/T';
 import { Chip, PillButton, Screen } from '@/components/ui';
-import { BREATH_PATTERNS } from '@/content/copy';
+import { BREATH_PATTERNS, type BreathPatternId } from '@/content/copy';
+import { useT } from '@/i18n';
 import { formatClock } from '@/lib/date';
 import { done } from '@/lib/haptics';
 import { space } from '@/theme/tokens';
@@ -13,8 +14,9 @@ import { space } from '@/theme/tokens';
 const DURATIONS = [1, 3, 5];
 
 export default function BreathTab() {
+  const t = useT();
   const focused = useIsFocused();
-  const [patternId, setPatternId] = useState(BREATH_PATTERNS[0].id);
+  const [patternId, setPatternId] = useState<BreathPatternId>(BREATH_PATTERNS[0].id);
   const [minutes, setMinutes] = useState(3);
   const [running, setRunning] = useState(false);
   const [left, setLeft] = useState(minutes * 60);
@@ -46,10 +48,10 @@ export default function BreathTab() {
   return (
     <Screen withTabBar contentStyle={{ paddingTop: space.lg, alignItems: 'stretch' }}>
       <T variant="title" center>
-        Breath
+        {t.breath.title}
       </T>
       <T variant="small" tone="faint" center style={{ marginTop: space.xs }}>
-        {pattern.line}
+        {t.breath.patterns[pattern.id].line}
       </T>
 
       <ScrollView
@@ -60,7 +62,7 @@ export default function BreathTab() {
         {BREATH_PATTERNS.map((p) => (
           <Chip
             key={p.id}
-            label={`${p.name}  ${p.rhythm}`}
+            label={`${t.breath.patterns[p.id].name}  ${p.rhythm}`}
             selected={p.id === patternId}
             onPress={() => {
               setRunning(false);
@@ -77,16 +79,16 @@ export default function BreathTab() {
       <View style={styles.footer}>
         {running ? (
           <T variant="label" center>
-            {formatClock(Math.max(left, 0))} left
+            {t.breath.left(formatClock(Math.max(left, 0)))}
           </T>
         ) : (
           <View style={styles.durations}>
             {DURATIONS.map((m) => (
-              <Chip key={m} size="sm" label={`${m} min`} selected={m === minutes} onPress={() => setMinutes(m)} />
+              <Chip key={m} size="sm" label={t.common.minutes(m)} selected={m === minutes} onPress={() => setMinutes(m)} />
             ))}
           </View>
         )}
-        <PillButton title={running ? 'Stop' : 'Begin'} kind={running ? 'secondary' : 'primary'} onPress={toggle} />
+        <PillButton title={running ? t.breath.stop : t.common.begin} kind={running ? 'secondary' : 'primary'} onPress={toggle} />
       </View>
     </Screen>
   );

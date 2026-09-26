@@ -15,7 +15,7 @@ import { toneFor } from '@/components/Cards';
 import { Enso } from '@/components/Enso';
 import { T } from '@/components/T';
 import { FadeIn, PillButton, Screen, TextLink } from '@/components/ui';
-import { sessionInfo } from '@/content/copy';
+import { useT } from '@/i18n';
 import { soft } from '@/lib/haptics';
 import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
@@ -25,6 +25,7 @@ const RELEASE_AT = -110;
 
 export default function Complete() {
   const { c } = useTheme();
+  const t = useT();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data, releaseSession } = useStore();
   const session = data.sessions.find((s) => s.id === id);
@@ -64,7 +65,6 @@ export default function Complete() {
   }));
 
   if (!session) return null;
-  const info = sessionInfo(session.type);
   const minutes = Math.max(1, Math.round((session.endedAt - session.startedAt) / 60000));
   const goHome = () => router.dismissTo('/');
 
@@ -74,10 +74,10 @@ export default function Complete() {
         <Enso size={128} />
         <FadeIn delay={1600} style={{ alignItems: 'center' }}>
           <T variant="label" style={{ marginTop: space.lg }}>
-            {info.name} · {minutes} min · {session.wordCount} words
+            {t.sessions[session.type].name} · {t.common.minutes(minutes)} · {t.common.words(session.wordCount)}
           </T>
           <T variant="display" center style={{ marginTop: space.sm }}>
-            You made some space.
+            {t.complete.title}
           </T>
         </FadeIn>
       </View>
@@ -87,27 +87,27 @@ export default function Complete() {
           <>
             <GestureDetector gesture={pan}>
               <Animated.View style={[styles.card, { backgroundColor: toneFor(c, session.type) }, card]}>
-                <T variant="label">What you unloaded</T>
+                <T variant="label">{t.complete.unloaded}</T>
                 <T variant="serifSmall" numberOfLines={7} style={{ marginTop: space.sm }}>
                   {session.text}
                 </T>
                 <T variant="small" tone="faint" center style={{ marginTop: space.md }}>
-                  Swipe up to let it go
+                  {t.complete.swipe}
                 </T>
               </Animated.View>
             </GestureDetector>
             <View style={styles.row}>
-              <PillButton title="Keep" kind="secondary" grow onPress={() => setChoice('kept')} />
-              <PillButton title="Let it go" grow onPress={letGo} />
+              <PillButton title={t.complete.keep} kind="secondary" grow onPress={() => setChoice('kept')} />
+              <PillButton title={t.complete.letGo} grow onPress={letGo} />
             </View>
             <T variant="small" tone="faint" center style={{ marginTop: space.md }}>
-              Letting go erases the words. The session stays in your calendar.
+              {t.complete.note}
             </T>
           </>
         ) : (
           <FadeIn style={styles.after}>
             <T variant="italic" center style={{ fontSize: 22, lineHeight: 30 }}>
-              {choice === 'released' ? "Gone. You don't have to carry it." : 'Kept. You can let it go later.'}
+              {choice === 'released' ? t.complete.released : t.complete.kept}
             </T>
           </FadeIn>
         )}
@@ -117,12 +117,12 @@ export default function Complete() {
         {data.settings.noticeShift && !session.shift && (
           <View style={{ alignItems: 'center' }}>
             <TextLink
-              title="Want to notice what shifted?"
+              title={t.complete.noticeShift}
               onPress={() => router.push({ pathname: '/session/shift', params: { id: session.id } })}
             />
           </View>
         )}
-        <PillButton title="Done" onPress={goHome} />
+        <PillButton title={t.common.done} onPress={goHome} />
       </View>
     </Screen>
   );

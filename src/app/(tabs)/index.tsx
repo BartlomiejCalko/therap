@@ -7,7 +7,7 @@ import { Icon } from '@/components/Icon';
 import { T } from '@/components/T';
 import { CircleButton, Screen, SectionLabel } from '@/components/ui';
 import { CHECKIN_STATES, type CheckinState } from '@/content/copy';
-import { greeting, longDate } from '@/lib/date';
+import { useT } from '@/i18n';
 import { tap } from '@/lib/haptics';
 import { useNow } from '@/lib/useNow';
 import { useStore } from '@/store/store';
@@ -19,6 +19,7 @@ const stateTone = (c: Palette, id: CheckinState) =>
 
 export default function Today() {
   const { c } = useTheme();
+  const t = useT();
   const now = useNow();
   const { sessions, captures, settings } = useStore().data;
   const waiting = captures.filter((x) => x.status === 'waiting').length;
@@ -27,34 +28,34 @@ export default function Today() {
   return (
     <Screen withTabBar texture>
       <View style={styles.header}>
-        <T variant="label">{longDate(now)}</T>
-        <CircleButton icon="settings" label="Settings" onPress={() => router.push('/settings')} />
+        <T variant="label">{t.dates.long(now)}</T>
+        <CircleButton icon="settings" label={t.common.settings} onPress={() => router.push('/settings')} />
       </View>
 
       <DayWindow
         now={now}
-        title={`${greeting(now)}${firstName ? `,\n${firstName}` : ''}`}
-        subtitle="Your thoughts have somewhere to go."
+        title={`${t.dates.greeting(now.getHours())}${firstName ? `,\n${firstName}` : ''}`}
+        subtitle={t.today.subtitle}
       />
 
       <T variant="heading" style={styles.question}>
-        What&apos;s on your mind right now?
+        {t.today.question}
       </T>
       <View style={styles.grid}>
         {CHECKIN_STATES.map((state) => (
           <Pressable
-            key={state.id}
+            key={state}
             accessibilityRole="button"
             onPress={() => {
               tap();
-              router.push({ pathname: '/checkin', params: { state: state.id } });
+              router.push({ pathname: '/checkin', params: { state } });
             }}
             style={({ pressed }) => [
               styles.stateTile,
-              { backgroundColor: stateTone(c, state.id), opacity: pressed ? 0.7 : 1 },
+              { backgroundColor: stateTone(c, state), opacity: pressed ? 0.7 : 1 },
             ]}>
             <T variant="serif" style={styles.stateText}>
-              {state.label}
+              {t.states[state]}
             </T>
             <View style={[styles.miniCircle, { backgroundColor: c.veil }]}>
               <Icon name="arrow" size={14} />
@@ -74,10 +75,10 @@ export default function Today() {
           <Icon name="unload" size={24} color={c.onInk} />
           <View>
             <T variant="medium" tone="onInk">
-              Choose a session
+              {t.today.chooseSession}
             </T>
             <T variant="small" tone="onInk" style={{ opacity: 0.65, marginTop: 2 }}>
-              Straight to writing
+              {t.today.chooseSessionHint}
             </T>
           </View>
         </Pressable>
@@ -91,11 +92,11 @@ export default function Today() {
             styles.actionCard,
             { backgroundColor: c.surface, borderColor: c.hairline, borderWidth: StyleSheet.hairlineWidth, flex: 1, opacity: pressed ? 0.7 : 1 },
           ]}>
-          <T variant="label">Guide</T>
+          <T variant="label">{t.today.guideLabel}</T>
           <View>
-            <T variant="medium">How to Unload</T>
+            <T variant="medium">{t.today.guideTitle}</T>
             <T variant="small" tone="faint" style={{ marginTop: 2 }}>
-              Before you begin
+              {t.today.guideHint}
             </T>
           </View>
         </Pressable>
@@ -110,7 +111,7 @@ export default function Today() {
           ]}>
           <View style={[styles.waitingDot, { backgroundColor: c.accent }]} />
           <T variant="body" style={{ flex: 1 }}>
-            {waiting === 1 ? 'One thought is waiting for you' : `${waiting} thoughts are waiting for you`}
+            {t.today.waiting(waiting)}
           </T>
           <Icon name="arrow" size={16} />
         </Pressable>
@@ -121,17 +122,17 @@ export default function Today() {
           sessions.length > 0 ? (
             <Pressable onPress={() => router.navigate('/calendar')} hitSlop={8}>
               <T variant="label" tone="soft">
-                See all
+                {t.today.seeAll}
               </T>
             </Pressable>
           ) : undefined
         }>
-        Recent sessions
+        {t.today.recent}
       </SectionLabel>
       {sessions.length === 0 ? (
         <View style={[styles.empty, { borderColor: c.hairline }]}>
           <T variant="italic" tone="faint" center style={{ fontSize: 17 }}>
-            Your sessions will rest here.
+            {t.today.empty}
           </T>
         </View>
       ) : (

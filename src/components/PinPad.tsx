@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { useT } from '@/i18n';
 import { tap } from '@/lib/haptics';
 import { useTheme } from '@/theme/theme';
 
@@ -28,6 +29,7 @@ export function PinDots({ length, error }: { length: number; error?: boolean }) 
 
 export function PinPad({ onDigit, onDelete }: { onDigit: (d: string) => void; onDelete: () => void }) {
   const { c } = useTheme();
+  const t = useT();
   const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'];
   return (
     <View style={styles.pad}>
@@ -38,7 +40,7 @@ export function PinPad({ onDigit, onDelete }: { onDigit: (d: string) => void; on
           <Pressable
             key={i}
             accessibilityRole="button"
-            accessibilityLabel={k === 'del' ? 'Delete' : k}
+            accessibilityLabel={k === 'del' ? t.pin.delete : k}
             onPress={() => {
               tap();
               if (k === 'del') onDelete();

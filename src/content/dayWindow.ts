@@ -10,13 +10,6 @@ export const dayPart = (d: Date): DayPart => {
   return 'night';
 };
 
-export const DAY_PART_LABEL: Record<DayPart, string> = {
-  morning: 'Morning',
-  afternoon: 'Afternoon',
-  evening: 'Evening',
-  night: 'Night',
-};
-
 export type WindowPhoto = {
   source: ImageSourcePropType;
   // Which text colour reads best on the photo.

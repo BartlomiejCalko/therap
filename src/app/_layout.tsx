@@ -15,6 +15,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { LockGate } from '@/components/LockGate';
+import { I18nProvider, useLang } from '@/i18n';
 import { StoreProvider, useStore } from '@/store/store';
 import { AppThemeProvider, useTheme } from '@/theme/theme';
 
@@ -40,11 +41,13 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <StoreProvider>
-          <AppThemeProvider>
-            <Root fontsLoaded={fontsLoaded} />
-          </AppThemeProvider>
-        </StoreProvider>
+        <I18nProvider>
+          <StoreProvider>
+            <AppThemeProvider>
+              <Root fontsLoaded={fontsLoaded} />
+            </AppThemeProvider>
+          </StoreProvider>
+        </I18nProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
@@ -53,10 +56,16 @@ export default function RootLayout() {
 function Root({ fontsLoaded }: { fontsLoaded: boolean }) {
   const { ready } = useStore();
   const { c, scheme } = useTheme();
+  const lang = useLang();
 
   useEffect(() => {
     if (fontsLoaded && ready) SplashScreen.hideAsync().catch(() => {});
   }, [fontsLoaded, ready]);
+
+  // Lets browsers and screen readers on web know which language the page is in.
+  useEffect(() => {
+    if (Platform.OS === 'web' && typeof document !== 'undefined') document.documentElement.lang = lang;
+  }, [lang]);
 
   if (!fontsLoaded || !ready) return null;
 

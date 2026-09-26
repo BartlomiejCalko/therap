@@ -1,7 +1,8 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { sessionInfo, type SessionType } from '@/content/copy';
-import { timeOfDay, weekdayShort } from '@/lib/date';
+import { type SessionType } from '@/content/copy';
+import { useT } from '@/i18n';
+import { timeOfDay } from '@/lib/date';
 import { tap } from '@/lib/haptics';
 import type { Capture, Session } from '@/store/types';
 import { useTheme } from '@/theme/theme';
@@ -24,7 +25,7 @@ export function SessionTile({
   width?: number;
 }) {
   const { c } = useTheme();
-  const info = sessionInfo(session.type);
+  const t = useT();
   return (
     <Pressable
       onPress={() => {
@@ -39,7 +40,7 @@ export function SessionTile({
       <View style={{ flex: 1, marginTop: space.md }}>
         {session.released ? (
           <T variant="italic" tone="soft" style={{ fontSize: 16, lineHeight: 22 }}>
-            Let go.
+            {t.common.letGo}
           </T>
         ) : (
           <T variant="serifSmall" numberOfLines={5} style={{ fontSize: 15, lineHeight: 21 }}>
@@ -48,7 +49,7 @@ export function SessionTile({
         )}
       </View>
       <T variant="label" style={{ marginTop: space.sm }}>
-        {info.name} · {weekdayShort(new Date(session.startedAt))}
+        {t.sessions[session.type].name} · {t.dates.weekdayShort(new Date(session.startedAt))}
       </T>
     </Pressable>
   );
@@ -64,12 +65,13 @@ export function CaptureCard({
   onMore: () => void;
 }) {
   const { c } = useTheme();
+  const t = useT();
   const explored = capture.status === 'explored';
   return (
     <View style={[styles.capture, { backgroundColor: explored ? c.bg : c.surface, borderColor: c.hairline }]}>
       <View style={styles.captureTop}>
         <T variant="label">{timeOfDay(capture.createdAt)}</T>
-        <Pressable accessibilityLabel="More options" hitSlop={10} onPress={onMore}>
+        <Pressable accessibilityLabel={t.common.moreOptions} hitSlop={10} onPress={onMore}>
           <Icon name="more" size={18} color={c.inkFaint} />
         </Pressable>
       </View>
@@ -79,7 +81,7 @@ export function CaptureCard({
       {explored ? (
         <View style={styles.status}>
           <View style={[styles.statusDot, { backgroundColor: c.inkFaint }]} />
-          <T variant="label">Explored</T>
+          <T variant="label">{t.capture.explored}</T>
         </View>
       ) : (
         <Pressable
@@ -90,7 +92,7 @@ export function CaptureCard({
           }}
           style={({ pressed }) => [styles.status, { opacity: pressed ? 0.5 : 1 }]}>
           <T variant="medium" style={{ fontSize: 13 }}>
-            Unload this
+            {t.capture.unloadThis}
           </T>
           <Icon name="arrow" size={14} />
         </Pressable>

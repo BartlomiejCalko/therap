@@ -8,14 +8,8 @@ import { CrossfadeText } from '@/components/CrossfadeText';
 import { Icon } from '@/components/Icon';
 import { T } from '@/components/T';
 import { CircleButton, PillButton, Sheet } from '@/components/ui';
-import {
-  COMPANION_PHRASES,
-  STARTERS,
-  TIME_UP_PHRASE,
-  sessionInfo,
-  type SessionType,
-  type SoundId,
-} from '@/content/copy';
+import { isSessionType, sessionMinutes, type SessionType, type SoundId } from '@/content/copy';
+import { useT } from '@/i18n';
 import { formatClock, wordCount } from '@/lib/date';
 import { done, tap } from '@/lib/haptics';
 import { useFocusSound } from '@/lib/useFocusSound';
@@ -32,8 +26,10 @@ type Params = {
   sound?: SoundId;
 };
 
-const pick = <T,>(list: T[], not?: T) => {
-  const options = list.filter((x) => x !== not);
+// A random index into a list, never the same as `not`. Indexes (not strings) keep the
+// prompt and phrase stable if the language changes mid-session.
+const pickIndex = (length: number, not?: number | null) => {
+  const options = Array.from({ length }, (_, i) => i).filter((i) => i !== not);
   return options[Math.floor(Math.random() * options.length)];
 };
 
@@ -43,9 +39,11 @@ const PAUSE_MS = 9_000;
 
 export default function Write() {
   const { c } = useTheme();
+  const t = useT();
   const params = useLocalSearchParams<Params>();
   const { data, addSession } = useStore();
-  const info = sessionInfo(params.type);
+  const type: SessionType = isSessionType(params.type) ? params.type : 'pause';
+  const minutes = sessionMinutes(type);
   const capture = data.captures.find((x) => x.id === params.captureId);
   const showStarter = params.starters === '1' && !capture;
   const companion = params.companion === '1';
@@ -53,12 +51,12 @@ export default function Write() {
 
   const [text, setText] = useState('');
   const [started, setStarted] = useState(false);
-  const [starter, setStarter] = useState(() => pick(STARTERS));
+  const [starter, setStarter] = useState(() => pickIndex(t.starters.length));
   const [startedAt] = useState(() => Date.now());
   const [now, setNow] = useState(() => Date.now());
   const [muted, setMuted] = useState(false);
   const [leaving, setLeaving] = useState(false);
-  const [phrase, setPhrase] = useState<string | null>(null);
+  const [phrase, setPhrase] = useState<number | null>(null);
   const phraseAt = useRef(Date.now());
   const typedAt = useRef(Date.now());
   const answeredPause = useRef(false);
@@ -66,7 +64,7 @@ export default function Write() {
 
   useFocusSound(sound, muted);
 
-  const planned = info.minutes * 60;
+  const planned = minutes * 60;
   const elapsed = (now - startedAt) / 1000;
   const remaining = planned - elapsed;
   const timeUp = remaining <= 0;
@@ -88,9 +86,9 @@ export default function Write() {
     if ((paused && !answeredPause.current) || now - phraseAt.current > PHRASE_EVERY_MS) {
       if (paused) answeredPause.current = true;
       phraseAt.current = now;
-      setPhrase((p) => pick(COMPANION_PHRASES, p ?? undefined));
+      setPhrase((p) => pickIndex(t.companion.length, p));
     }
-  }, [now, timeUp, companion, started]);
+  }, [now, timeUp, companion, started, t.companion.length]);
 
   const onChange = (value: string) => {
     setText(value);
@@ -106,10 +104,10 @@ export default function Write() {
       return;
     }
     const id = addSession({
-      type: info.id,
+      type,
       startedAt,
       endedAt: Date.now(),
-      plannedMinutes: info.minutes,
+      plannedMinutes: minutes,
       text: trimmed,
       wordCount: wordCount(trimmed),
       checkinId: params.checkinId,
@@ -118,24 +116,24 @@ export default function Write() {
     router.replace({ pathname: '/session/complete', params: { id } });
   };
 
-  const opening = capture ? capture.text : showStarter ? starter : null;
-  const bottomPhrase = timeUp ? TIME_UP_PHRASE : phrase;
+  const opening = capture ? capture.text : showStarter ? t.starters[starter] : null;
+  const bottomPhrase = timeUp ? t.write.timeUp : phrase === null ? null : t.companion[phrase];
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1, backgroundColor: c.bg }}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={styles.header}>
-          <CircleButton icon="close" label="Leave session" onPress={() => setLeaving(true)} />
+          <CircleButton icon="close" label={t.write.leave} onPress={() => setLeaving(true)} />
           <View style={{ alignItems: 'center' }}>
-            <T variant="label">{info.name}</T>
+            <T variant="label">{t.sessions[type].name}</T>
             <T variant="medium" style={{ marginTop: 2, fontVariant: ['tabular-nums'] }}>
-              {timeUp ? 'Time' : formatClock(remaining)}
+              {timeUp ? t.write.time : formatClock(remaining)}
             </T>
           </View>
           {sound !== 'none' ? (
             <CircleButton
               icon={muted ? 'soundOff' : 'sound'}
-              label={muted ? 'Play sound' : 'Mute sound'}
+              label={muted ? t.write.unmute : t.write.mute}
               onPress={() => setMuted((m) => !m)}
             />
           ) : (
@@ -156,18 +154,18 @@ export default function Write() {
         <View style={styles.page}>
           {opening && !started && (
             <Animated.View exiting={FadeOut.duration(600)} style={styles.opening}>
-              <T variant="label">{capture ? 'Your captured thought' : 'Begin here'}</T>
+              <T variant="label">{capture ? t.write.captured : t.write.beginHere}</T>
               <View style={styles.openingRow}>
                 <T variant="italic" style={{ flex: 1, fontSize: 24, lineHeight: 32 }}>
                   {opening}
                 </T>
                 {!capture && (
                   <Pressable
-                    accessibilityLabel="Another prompt"
+                    accessibilityLabel={t.write.anotherPrompt}
                     hitSlop={10}
                     onPress={() => {
                       tap();
-                      setStarter((s) => pick(STARTERS, s));
+                      setStarter((s) => pickIndex(t.starters.length, s));
                     }}>
                     <Icon name="refresh" size={18} color={c.inkFaint} />
                   </Pressable>
@@ -184,7 +182,7 @@ export default function Write() {
               autoFocus
               scrollEnabled
               textAlignVertical="top"
-              placeholder="Start anywhere."
+              placeholder={t.write.placeholder}
               placeholderTextColor={c.inkFaint}
               selectionColor={c.accent}
               style={[styles.input, { color: c.ink }]}
@@ -197,11 +195,9 @@ export default function Write() {
             <CrossfadeText text={bottomPhrase} />
           </View>
           <View style={styles.actions}>
-            <T variant="label">
-              {words} {words === 1 ? 'word' : 'words'}
-            </T>
+            <T variant="label">{t.common.words(words)}</T>
             <PillButton
-              title="Finish"
+              title={t.write.finish}
               kind={timeUp ? 'primary' : 'secondary'}
               onPress={finish}
               disabled={!text.trim()}
@@ -211,20 +207,20 @@ export default function Write() {
         </View>
       </KeyboardAvoidingView>
 
-      <Sheet visible={leaving} onClose={() => setLeaving(false)} title="Leave this session?">
+      <Sheet visible={leaving} onClose={() => setLeaving(false)} title={t.write.leaveTitle}>
         <View style={{ gap: 10 }}>
           {text.trim() ? (
             <PillButton
-              title="Finish and keep what I wrote"
+              title={t.write.finishKeep}
               onPress={() => {
                 setLeaving(false);
                 finish();
               }}
             />
           ) : null}
-          <PillButton title="Keep writing" kind="secondary" onPress={() => setLeaving(false)} />
+          <PillButton title={t.write.keepWriting} kind="secondary" onPress={() => setLeaving(false)} />
           <PillButton
-            title={text.trim() ? 'Leave without saving' : 'Leave'}
+            title={text.trim() ? t.write.leaveWithoutSaving : t.write.leaveEmpty}
             kind="ghost"
             onPress={() => {
               setLeaving(false);

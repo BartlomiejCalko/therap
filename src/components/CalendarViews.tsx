@@ -2,26 +2,9 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import {
-  CHECKIN_STATES,
-  SESSIONS,
-  SHIFT_AREAS,
-  sessionInfo,
-  stateLabel,
-  type ShiftValue,
-} from '@/content/copy';
-import {
-  addDays,
-  DAY_MS,
-  groupByDay,
-  isSameDay,
-  longDate,
-  monthName,
-  monthShort,
-  startOfDay,
-  startOfWeek,
-  timeOfDay,
-} from '@/lib/date';
+import { CHECKIN_STATES, SESSIONS, SHIFT_AREAS, SHIFT_VALUES } from '@/content/copy';
+import { useT } from '@/i18n';
+import { addDays, DAY_MS, groupByDay, isSameDay, startOfDay, startOfWeek, timeOfDay } from '@/lib/date';
 import { tap } from '@/lib/haptics';
 import type { Checkin, Session } from '@/store/types';
 import { useTheme } from '@/theme/theme';
@@ -36,6 +19,7 @@ const minutesOf = (s: Session) => Math.max(1, Math.round((s.endedAt - s.startedA
 // ---------- Row ----------
 
 export function SessionRow({ session, checkin }: { session: Session; checkin?: Checkin }) {
+  const t = useT();
   return (
     <Pressable
       onPress={() => {
@@ -49,15 +33,15 @@ export function SessionRow({ session, checkin }: { session: Session; checkin?: C
       <SessionMark type={session.type} size={24} />
       <View style={{ flex: 1, gap: 4 }}>
         <T variant="medium">
-          {sessionInfo(session.type).name}
+          {t.sessions[session.type].name}
           <T variant="small" tone="faint">
             {'  '}
-            {minutesOf(session)} min
+            {t.common.minutes(minutesOf(session))}
           </T>
         </T>
         {session.released ? (
           <T variant="italic" tone="soft" style={{ fontSize: 16, lineHeight: 22 }}>
-            Let go.
+            {t.common.letGo}
           </T>
         ) : (
           <T variant="serifSmall" tone="soft" numberOfLines={2}>
@@ -66,7 +50,7 @@ export function SessionRow({ session, checkin }: { session: Session; checkin?: C
         )}
         {checkin && (
           <T variant="small" tone="faint">
-            {stateLabel(checkin.state)}
+            {t.states[checkin.state]}
             {checkin.name ? ` — ${checkin.name}` : ''}
           </T>
         )}
@@ -99,12 +83,13 @@ function EmptyNote({ children }: { children: string }) {
 // ---------- Timeline ----------
 
 export function Timeline({ sessions, checkins }: { sessions: Session[]; checkins: Checkin[] }) {
-  if (sessions.length === 0) return <EmptyNote>Your first session will appear here.</EmptyNote>;
+  const t = useT();
+  if (sessions.length === 0) return <EmptyNote>{t.calendar.firstSession}</EmptyNote>;
   return (
     <View>
       {groupByDay(sessions, (s) => s.startedAt).map((g) => (
         <View key={g.key}>
-          <SectionLabel>{longDate(g.time)}</SectionLabel>
+          <SectionLabel>{t.dates.long(new Date(g.time))}</SectionLabel>
           <SessionList sessions={g.items} checkins={checkins} />
         </View>
       ))}
@@ -118,25 +103,24 @@ const dotSize = (minutes: number) => 6 + Math.sqrt(minutes) * 2.2;
 
 export function WeekView({ sessions, checkins }: { sessions: Session[]; checkins: Checkin[] }) {
   const { c } = useTheme();
+  const t = useT();
   const [start, setStart] = useState(() => startOfWeek(Date.now()));
   const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
   const end = addDays(start, 7).getTime();
   const inWeek = sessions.filter((s) => s.startedAt >= start.getTime() && s.startedAt < end);
   const isCurrent = startOfWeek(Date.now()).getTime() === start.getTime();
 
-  const range = `${start.getDate()} ${monthShort(start.getMonth())} – ${days[6].getDate()} ${monthShort(days[6].getMonth())}`;
-
   return (
     <View>
       <View style={styles.nav}>
-        <CircleButton icon="back" label="Previous week" size={34} onPress={() => setStart(addDays(start, -7))} />
+        <CircleButton icon="back" label={t.calendar.prevWeek} size={34} onPress={() => setStart(addDays(start, -7))} />
         <T variant="label" tone="ink">
-          {range}
+          {t.dates.range(start, days[6])}
         </T>
         <View style={{ opacity: isCurrent ? 0.25 : 1 }}>
           <CircleButton
             icon="arrow"
-            label="Next week"
+            label={t.calendar.nextWeek}
             size={34}
             onPress={() => !isCurrent && setStart(addDays(start, 7))}
           />
@@ -144,7 +128,7 @@ export function WeekView({ sessions, checkins }: { sessions: Session[]; checkins
       </View>
 
       <View style={styles.week}>
-        {days.map((d) => {
+        {days.map((d, i) => {
           const daySessions = inWeek.filter((s) => isSameDay(s.startedAt, d));
           const total = daySessions.reduce((sum, s) => sum + minutesOf(s), 0);
           const today = isSameDay(d, Date.now());
@@ -169,27 +153,27 @@ export function WeekView({ sessions, checkins }: { sessions: Session[]; checkins
                 })}
               </View>
               <T variant="label" tone={today ? 'ink' : 'faint'} style={{ marginTop: 10 }}>
-                {'MTWTFSS'[(d.getDay() + 6) % 7]}
+                {t.dates.initials[i]}
               </T>
               <T variant="small" tone={today ? 'ink' : 'faint'}>
                 {d.getDate()}
               </T>
               <T variant="label" style={{ marginTop: 4, minHeight: 14 }}>
-                {total ? `${total}m` : ''}
+                {total ? t.calendar.dayMinutes(total) : ''}
               </T>
             </View>
           );
         })}
       </View>
       <T variant="small" tone="faint" center style={{ marginTop: space.md }}>
-        Filled circles were kept. Open circles were let go.
+        {t.calendar.weekLegend}
       </T>
 
       {inWeek.length === 0 ? (
-        <EmptyNote>A quiet week.</EmptyNote>
+        <EmptyNote>{t.calendar.quietWeek}</EmptyNote>
       ) : (
         <>
-          <SectionLabel>This week</SectionLabel>
+          <SectionLabel>{t.calendar.thisWeek}</SectionLabel>
           <SessionList sessions={inWeek} checkins={checkins} />
         </>
       )}
@@ -201,6 +185,7 @@ export function WeekView({ sessions, checkins }: { sessions: Session[]; checkins
 
 export function MonthView({ sessions, checkins }: { sessions: Session[]; checkins: Checkin[] }) {
   const { c } = useTheme();
+  const t = useT();
   const now = new Date();
   const [month, setMonth] = useState({ y: now.getFullYear(), m: now.getMonth() });
   const [selected, setSelected] = useState(() => startOfDay(Date.now()));
@@ -224,17 +209,20 @@ export function MonthView({ sessions, checkins }: { sessions: Session[]; checkin
   return (
     <View>
       <View style={styles.nav}>
-        <CircleButton icon="back" label="Previous month" size={34} onPress={() => shift(-1)} />
+        <CircleButton icon="back" label={t.calendar.prevMonth} size={34} onPress={() => shift(-1)} />
         <T variant="heading">
-          {monthName(month.m)} <T variant="heading" tone="faint">{month.y}</T>
+          {t.dates.month(month.m)}{' '}
+          <T variant="heading" tone="faint">
+            {month.y}
+          </T>
         </T>
         <View style={{ opacity: isCurrent ? 0.25 : 1 }}>
-          <CircleButton icon="arrow" label="Next month" size={34} onPress={() => !isCurrent && shift(1)} />
+          <CircleButton icon="arrow" label={t.calendar.nextMonth} size={34} onPress={() => !isCurrent && shift(1)} />
         </View>
       </View>
 
       <View style={styles.monthGrid}>
-        {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
+        {t.dates.initials.map((d, i) => (
           <View key={i} style={styles.monthCell}>
             <T variant="label">{d}</T>
           </View>
@@ -273,10 +261,10 @@ export function MonthView({ sessions, checkins }: { sessions: Session[]; checkin
         })}
       </View>
 
-      <SectionLabel>{longDate(selected)}</SectionLabel>
+      <SectionLabel>{t.dates.long(selected)}</SectionLabel>
       {selectedSessions.length === 0 ? (
         <T variant="italic" tone="faint" style={{ fontSize: 17 }}>
-          No sessions this day.
+          {t.calendar.noSessionsDay}
         </T>
       ) : (
         <SessionList sessions={selectedSessions} checkins={checkins} />
@@ -286,13 +274,6 @@ export function MonthView({ sessions, checkins }: { sessions: Session[]; checkin
 }
 
 // ---------- Insights ----------
-
-const SHIFT_WORDS: Record<string, Record<ShiftValue, string>> = Object.fromEntries(
-  SHIFT_AREAS.map((a) => [
-    a.id,
-    { better: a.options.better.toLowerCase(), same: 'same', worse: a.options.worse.toLowerCase() },
-  ]),
-);
 
 export function Insights({
   sessions,
@@ -304,14 +285,12 @@ export function Insights({
   noticeShift: boolean;
 }) {
   const { c } = useTheme();
+  const t = useT();
   const minutes = sessions.reduce((sum, s) => sum + minutesOf(s), 0);
   const released = sessions.filter((s) => s.released).length;
-  const stateCounts = CHECKIN_STATES.map((st) => ({
-    ...st,
-    count: checkins.filter((x) => x.state === st.id).length,
-  }));
+  const stateCounts = CHECKIN_STATES.map((id) => ({ id, count: checkins.filter((x) => x.state === id).length }));
   const maxState = Math.max(1, ...stateCounts.map((s) => s.count));
-  const typeCounts = SESSIONS.map((t) => ({ ...t, count: sessions.filter((s) => s.type === t.id).length }));
+  const typeCounts = SESSIONS.map((s) => ({ id: s.id, count: sessions.filter((x) => x.type === s.id).length }));
   const favourite = [...typeCounts].sort((a, b) => b.count - a.count)[0];
   const withShift = sessions.filter((s) => s.shift && Object.values(s.shift).some(Boolean));
   const last30 = sessions.filter((s) => s.startedAt > Date.now() - 30 * DAY_MS).length;
@@ -320,11 +299,13 @@ export function Insights({
     <View>
       <View style={[styles.stats, { borderColor: c.hairline }]}>
         {[
-          { n: sessions.length, label: 'Sessions' },
-          { n: minutes, label: 'Minutes' },
-          { n: released, label: 'Let go' },
+          { n: sessions.length, label: t.calendar.stats.sessions },
+          { n: minutes, label: t.calendar.stats.minutes },
+          { n: released, label: t.calendar.stats.letGo },
         ].map((s, i) => (
-          <View key={s.label} style={[styles.stat, i > 0 && { borderLeftWidth: StyleSheet.hairlineWidth, borderColor: c.hairline }]}>
+          <View
+            key={s.label}
+            style={[styles.stat, i > 0 && { borderLeftWidth: StyleSheet.hairlineWidth, borderColor: c.hairline }]}>
             <T variant="display" center>
               {s.n}
             </T>
@@ -336,21 +317,21 @@ export function Insights({
       </View>
       {favourite.count > 0 && (
         <T variant="small" tone="faint" center style={{ marginTop: space.md }}>
-          {last30} in the last 30 days · most often {favourite.name}
+          {t.calendar.recentLine(last30, t.sessions[favourite.id].name)}
         </T>
       )}
 
-      <SectionLabel>What brings you here</SectionLabel>
+      <SectionLabel>{t.calendar.brings}</SectionLabel>
       {checkins.length === 0 ? (
         <T variant="italic" tone="faint" style={{ fontSize: 17 }}>
-          Choose what&apos;s on your mind on Today to see it here.
+          {t.calendar.bringsEmpty}
         </T>
       ) : (
         <View style={{ gap: space.md }}>
           {stateCounts.map((s) => (
             <View key={s.id} style={{ gap: 6 }}>
               <View style={styles.barLabel}>
-                <T variant="serifSmall">{s.label}</T>
+                <T variant="serifSmall">{t.states[s.id]}</T>
                 <T variant="label" tone="ink">
                   {s.count}
                 </T>
@@ -363,29 +344,28 @@ export function Insights({
         </View>
       )}
 
-      <SectionLabel>Your shifts</SectionLabel>
+      <SectionLabel>{t.calendar.shifts}</SectionLabel>
       {withShift.length === 0 ? (
         <T variant="italic" tone="faint" style={{ fontSize: 17 }}>
-          {noticeShift
-            ? 'After a session, notice what shifted to see it here.'
-            : 'Turn on “Notice the shift” in Settings to see this.'}
+          {noticeShift ? t.calendar.shiftsEmpty : t.calendar.shiftsOff}
         </T>
       ) : (
         <View style={{ gap: space.lg }}>
           {SHIFT_AREAS.map((area) => {
-            const counts = (['better', 'same', 'worse'] as ShiftValue[]).map((v) => ({
+            const copy = t.shift.areas[area];
+            const counts = SHIFT_VALUES.map((v) => ({
               v,
-              n: withShift.filter((s) => s.shift?.[area.id] === v).length,
+              n: withShift.filter((s) => s.shift?.[area] === v).length,
             }));
             const total = Math.max(1, counts.reduce((sum, x) => sum + x.n, 0));
             const tones = [c.ink, c.inkFaint, c.hairline];
             return (
-              <View key={area.id} style={{ gap: 8 }}>
+              <View key={area} style={{ gap: 8 }}>
                 <T variant="heading" style={{ fontSize: 19 }}>
-                  {area.name}
+                  {copy.name}
                 </T>
                 <T variant="small" tone="soft">
-                  {counts.map((x) => `${x.n} ${SHIFT_WORDS[area.id][x.v]}`).join(' · ')}
+                  {t.shift.summary(counts.map((x) => ({ label: copy[x.v], count: x.n })))}
                 </T>
                 <View style={styles.shiftBar}>
                   {counts.map((x, i) =>

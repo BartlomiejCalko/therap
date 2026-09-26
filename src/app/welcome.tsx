@@ -5,12 +5,14 @@ import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'rea
 import { Enso } from '@/components/Enso';
 import { T } from '@/components/T';
 import { FadeIn, PillButton, Screen } from '@/components/ui';
+import { useT } from '@/i18n';
 import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
 import { fonts, space } from '@/theme/tokens';
 
 export default function Welcome() {
   const { c } = useTheme();
+  const t = useT();
   const { updateSettings } = useStore();
   const [name, setName] = useState('');
 
@@ -29,18 +31,18 @@ export default function Welcome() {
               Unload
             </T>
             <T variant="italic" tone="soft" center style={{ marginTop: space.sm }}>
-              Your thoughts have somewhere to go.
+              {t.welcome.tagline}
             </T>
           </FadeIn>
         </View>
 
         <FadeIn delay={1500} style={{ gap: space.lg }}>
           <View>
-            <T variant="label">What should we call you?</T>
+            <T variant="label">{t.welcome.nameLabel}</T>
             <TextInput
               value={name}
               onChangeText={setName}
-              placeholder="Your first name"
+              placeholder={t.welcome.namePlaceholder}
               placeholderTextColor={c.inkFaint}
               autoCapitalize="words"
               returnKeyType="done"
@@ -48,7 +50,7 @@ export default function Welcome() {
               style={[styles.input, { color: c.ink, borderBottomColor: c.hairline }]}
             />
           </View>
-          <PillButton title="Begin" icon="arrow" onPress={begin} />
+          <PillButton title={t.welcome.begin} icon="arrow" onPress={begin} />
         </FadeIn>
       </Screen>
     </KeyboardAvoidingView>

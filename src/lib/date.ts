@@ -1,35 +1,9 @@
-const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
+// Date arithmetic. Names of days and months live in the language dictionaries (t.dates).
+import type { Dict } from '@/i18n/en';
 
 export const DAY_MS = 24 * 60 * 60 * 1000;
 
 export const pad = (n: number) => String(n).padStart(2, '0');
-
-export const weekdayName = (d: Date) => WEEKDAYS[d.getDay()];
-export const weekdayShort = (d: Date) => WEEKDAYS[d.getDay()].slice(0, 3);
-export const monthName = (m: number) => MONTHS[m];
-export const monthShort = (m: number) => MONTHS[m].slice(0, 3);
-
-export function greeting(date = new Date()) {
-  const h = date.getHours();
-  if (h < 5) return 'Hello';
-  if (h < 12) return 'Good morning';
-  if (h < 18) return 'Good afternoon';
-  return 'Good evening';
-}
 
 export const startOfDay = (t: number | Date) => {
   const d = new Date(t);
@@ -59,21 +33,12 @@ export const timeOfDay = (t: number) => {
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
-export const longDate = (t: number | Date) => {
-  const d = new Date(t);
-  return `${weekdayName(d)}, ${d.getDate()} ${monthName(d.getMonth())}`;
-};
-
-export const shortDate = (t: number | Date) => {
-  const d = new Date(t);
-  return `${weekdayShort(d)} ${d.getDate()} ${monthShort(d.getMonth())}`;
-};
-
-export function dayLabel(t: number) {
+// "Today", "Yesterday", or a short date — in the current language.
+export function dayLabel(t: number, dates: Dict['dates']) {
   const now = Date.now();
-  if (isSameDay(t, now)) return 'Today';
-  if (isSameDay(t, now - DAY_MS)) return 'Yesterday';
-  return shortDate(t);
+  if (isSameDay(t, now)) return dates.today;
+  if (isSameDay(t, now - DAY_MS)) return dates.yesterday;
+  return dates.short(new Date(t));
 }
 
 export const formatClock = (totalSeconds: number) => {

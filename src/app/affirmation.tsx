@@ -3,30 +3,31 @@ import { StyleSheet, View } from 'react-native';
 
 import { T } from '@/components/T';
 import { CircleButton, FadeIn, PillButton, Screen, TopBar } from '@/components/ui';
-import { AFFIRMATION } from '@/content/copy';
+import { useT } from '@/i18n';
 import { useTheme } from '@/theme/theme';
 import { space } from '@/theme/tokens';
 
 export default function Affirmation() {
   const { c } = useTheme();
+  const t = useT();
   const { checkinId } = useLocalSearchParams<{ checkinId?: string }>();
 
   return (
     <Screen scroll={false} edges={['top', 'bottom']}>
-      <TopBar left={<CircleButton icon="back" label="Back" onPress={() => router.back()} />} />
+      <TopBar left={<CircleButton icon="back" label={t.common.back} onPress={() => router.back()} />} />
       <View style={styles.center}>
         <FadeIn>
           <View style={[styles.rule, { backgroundColor: c.ink }]} />
         </FadeIn>
         <FadeIn delay={300}>
           <T variant="display" center style={{ fontSize: 34, lineHeight: 42 }}>
-            {AFFIRMATION}
+            {t.affirmation}
           </T>
         </FadeIn>
       </View>
       <FadeIn delay={1400} style={{ paddingBottom: space.md }}>
         <PillButton
-          title="Choose your session"
+          title={t.choose.title}
           icon="arrow"
           onPress={() => router.push({ pathname: '/choose', params: checkinId ? { checkinId } : {} })}
         />

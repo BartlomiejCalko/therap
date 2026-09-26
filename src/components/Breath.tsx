@@ -8,7 +8,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { PHASE_LABEL, type BreathPattern } from '@/content/copy';
+import { type BreathPattern } from '@/content/copy';
+import { useT } from '@/i18n';
 import { soft } from '@/lib/haptics';
 import { useTheme } from '@/theme/theme';
 
@@ -57,7 +58,7 @@ export function BreathCircle({
   pattern,
   running,
   size = 280,
-  idleLabel = 'Ready when you are',
+  idleLabel,
 }: {
   pattern: BreathPattern;
   running: boolean;
@@ -65,6 +66,7 @@ export function BreathCircle({
   idleLabel?: string;
 }) {
   const { c } = useTheme();
+  const t = useT();
   const { scale, phase } = useBreath(pattern, running);
   const animated = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
@@ -91,7 +93,7 @@ export function BreathCircle({
         ]}
       />
       <T variant="italic" tone={phase ? 'ink' : 'soft'} center style={{ fontSize: 22 }}>
-        {phase ? PHASE_LABEL[phase.kind] : idleLabel}
+        {phase ? t.breath.phases[phase.kind] : (idleLabel ?? t.breath.idle)}
       </T>
     </View>
   );

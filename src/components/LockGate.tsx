@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AppState, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useT } from '@/i18n';
 import { checkPin } from '@/lib/pin';
 import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
@@ -12,6 +13,7 @@ import { T } from './T';
 // Covers the app with a PIN screen on launch and whenever it returns from the background.
 export function LockGate({ children }: { children: ReactNode }) {
   const { c } = useTheme();
+  const t = useT();
   const { pinEnabled } = useStore().data.settings;
   const [locked, setLocked] = useState(pinEnabled);
   const [entry, setEntry] = useState('');
@@ -56,7 +58,7 @@ export function LockGate({ children }: { children: ReactNode }) {
             Unload
           </T>
           <T variant="title" center style={{ marginTop: 12 }}>
-            {error ? 'Try again' : 'Enter your PIN'}
+            {error ? t.lock.retry : t.lock.enter}
           </T>
           <PinDots length={entry.length} error={error} />
           <PinPad onDigit={onDigit} onDelete={() => setEntry((e) => e.slice(0, -1))} />

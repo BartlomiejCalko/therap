@@ -6,6 +6,7 @@ import { BreathCircle } from '@/components/Breath';
 import { T } from '@/components/T';
 import { CircleButton, PillButton, Screen, TopBar } from '@/components/ui';
 import { BREATH_PATTERNS } from '@/content/copy';
+import { useT } from '@/i18n';
 import { formatClock } from '@/lib/date';
 import { space } from '@/theme/tokens';
 
@@ -14,6 +15,7 @@ const SETTLE = BREATH_PATTERNS[0];
 
 // The optional one-minute breath before writing.
 export default function Ground() {
+  const t = useT();
   const params = useLocalSearchParams<Record<string, string>>();
   const [left, setLeft] = useState(SECONDS);
 
@@ -37,22 +39,22 @@ export default function Ground() {
   return (
     <Screen scroll={false} edges={['top', 'bottom']}>
       <TopBar
-        left={<CircleButton icon="back" label="Back" onPress={() => router.back()} />}
-        center={<T variant="label">Before you begin</T>}
+        left={<CircleButton icon="back" label={t.common.back} onPress={() => router.back()} />}
+        center={<T variant="label">{t.ground.label}</T>}
       />
       <View style={styles.center}>
         <T variant="title" center>
-          Arrive first
+          {t.ground.title}
         </T>
         <T variant="small" tone="faint" center style={{ marginTop: space.xs, marginBottom: space.xl }}>
-          One minute to land. Breathe with the circle.
+          {t.ground.hint}
         </T>
         <BreathCircle pattern={SETTLE} running size={260} />
         <T variant="label" style={{ marginTop: space.xl }}>
           {formatClock(Math.max(left, 0))}
         </T>
       </View>
-      <PillButton title="Start writing" kind="secondary" icon="arrow" onPress={toWriting} />
+      <PillButton title={t.ground.start} kind="secondary" icon="arrow" onPress={toWriting} />
     </Screen>
   );
 }

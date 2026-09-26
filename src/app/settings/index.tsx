@@ -1,60 +1,64 @@
 import { router } from 'expo-router';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { Linking, Platform, StyleSheet, TextInput, View } from 'react-native';
 
 import { T } from '@/components/T';
 import { Chip, CircleButton, Hairline, Row, Screen, SectionLabel, Segmented, Toggle, TopBar } from '@/components/ui';
 import { SOUNDS } from '@/content/copy';
+import { useT } from '@/i18n';
 import { useStore } from '@/store/store';
 import type { SessionOptions, ThemeMode } from '@/store/types';
 import { useTheme } from '@/theme/theme';
 import { fonts, space } from '@/theme/tokens';
 
-const OPTION_ROWS: { key: keyof SessionOptions; title: string; detail: string }[] = [
-  { key: 'starters', title: 'Starter prompts', detail: 'A question to begin with' },
-  { key: 'companion', title: 'Companion phrases', detail: 'Quiet words above the keyboard while you write' },
-  { key: 'sound', title: 'Focus sound', detail: 'A soft loop in the background' },
-  { key: 'breath', title: 'Breathing invitation', detail: 'One minute to arrive before writing' },
-];
+const OPTION_KEYS: (keyof SessionOptions)[] = ['starters', 'companion', 'sound', 'breath'];
 
 export default function Settings() {
   const { c } = useTheme();
+  const t = useT();
   const { data, updateSettings } = useStore();
   const s = data.settings;
   const setDefault = (patch: Partial<SessionOptions>) => updateSettings({ defaults: { ...s.defaults, ...patch } });
   // With "design each session" on, anything not asked each time falls back to these defaults.
-  const fixed = OPTION_ROWS.filter((o) => !s.customizeEachSession || !s.askEachTime[o.key]);
+  const fixed = OPTION_KEYS.filter((key) => !s.customizeEachSession || !s.askEachTime[key]);
 
   return (
     <Screen edges={['top', 'bottom']}>
       <TopBar
-        left={<CircleButton icon="back" label="Back" onPress={() => router.back()} />}
-        center={<T variant="label">Settings</T>}
+        left={<CircleButton icon="back" label={t.common.back} onPress={() => router.back()} />}
+        center={<T variant="label">{t.settings.title}</T>}
       />
 
-      <SectionLabel>About</SectionLabel>
+      <SectionLabel>{t.settings.about}</SectionLabel>
       <Hairline />
-      <Row title="The Unload method" onPress={() => router.push('/settings/method')} last />
+      <Row title={t.settings.method} onPress={() => router.push('/settings/method')} />
+      {/* The language follows the device. On iOS and Android the app's own settings page offers a per-app language. */}
+      <Row
+        title={t.settings.language}
+        detail={t.settings.languageDetail(t.language)}
+        onPress={Platform.OS === 'web' ? undefined : () => Linking.openSettings()}
+        last
+      />
       <Hairline />
 
-      <SectionLabel>Appearance</SectionLabel>
+      <SectionLabel>{t.settings.appearance}</SectionLabel>
       <Segmented<ThemeMode>
         value={s.theme}
         onChange={(theme) => updateSettings({ theme })}
         items={[
-          { key: 'system', label: 'System' },
-          { key: 'light', label: 'Light' },
-          { key: 'dark', label: 'Dark' },
+          { key: 'system', label: t.settings.themes.system },
+          { key: 'light', label: t.settings.themes.light },
+          { key: 'dark', label: t.settings.themes.dark },
         ]}
       />
 
-      <SectionLabel>Sessions</SectionLabel>
+      <SectionLabel>{t.settings.sessions}</SectionLabel>
       <Hairline />
       <Row
-        title="Design each session"
-        detail="Choose what to include every time you start"
+        title={t.settings.designEach}
+        detail={t.settings.designEachHint}
         right={
           <Toggle
-            label="Design each session"
+            label={t.settings.designEach}
             value={s.customizeEachSession}
             onChange={(v) => updateSettings({ customizeEachSession: v })}
           />
@@ -63,18 +67,18 @@ export default function Settings() {
       {s.customizeEachSession && (
         <View style={[styles.nested, { borderLeftColor: c.hairline }]}>
           <T variant="label" style={{ marginTop: space.md }}>
-            Ask me each time about
+            {t.settings.askEachTime}
           </T>
-          {OPTION_ROWS.map((o, i) => (
+          {OPTION_KEYS.map((key, i) => (
             <Row
-              key={o.key}
-              title={o.title}
-              last={i === OPTION_ROWS.length - 1}
+              key={key}
+              title={t.settings.options[key].title}
+              last={i === OPTION_KEYS.length - 1}
               right={
                 <Toggle
-                  label={`Ask about ${o.title}`}
-                  value={s.askEachTime[o.key]}
-                  onChange={(v) => updateSettings({ askEachTime: { ...s.askEachTime, [o.key]: v } })}
+                  label={t.settings.askAbout(t.settings.options[key].title)}
+                  value={s.askEachTime[key]}
+                  onChange={(v) => updateSettings({ askEachTime: { ...s.askEachTime, [key]: v } })}
                 />
               }
             />
@@ -85,25 +89,25 @@ export default function Settings() {
       {fixed.length > 0 && (
         <>
           <T variant="label" style={{ marginTop: space.lg, marginBottom: space.xs }}>
-            {s.customizeEachSession ? 'Always use' : 'Every session includes'}
+            {s.customizeEachSession ? t.settings.alwaysUse : t.settings.everySession}
           </T>
-          {fixed.map((o) =>
-            o.key === 'sound' ? (
-              <View key={o.key} style={{ paddingVertical: space.md, gap: space.md }}>
+          {fixed.map((key) =>
+            key === 'sound' ? (
+              <View key={key} style={{ paddingVertical: space.md, gap: space.md }}>
                 <View>
-                  <T variant="body">{o.title}</T>
+                  <T variant="body">{t.settings.options.sound.title}</T>
                   <T variant="small" tone="faint">
-                    {o.detail}
+                    {t.settings.options.sound.detail}
                   </T>
                 </View>
                 <View style={styles.chips}>
-                  {SOUNDS.map((snd) => (
+                  {SOUNDS.map((id) => (
                     <Chip
-                      key={snd.id}
+                      key={id}
                       size="sm"
-                      label={snd.name}
-                      selected={s.defaults.sound === snd.id}
-                      onPress={() => setDefault({ sound: snd.id })}
+                      label={t.sounds[id]}
+                      selected={s.defaults.sound === id}
+                      onPress={() => setDefault({ sound: id })}
                     />
                   ))}
                 </View>
@@ -111,14 +115,14 @@ export default function Settings() {
               </View>
             ) : (
               <Row
-                key={o.key}
-                title={o.title}
-                detail={o.detail}
+                key={key}
+                title={t.settings.options[key].title}
+                detail={t.settings.options[key].detail}
                 right={
                   <Toggle
-                    label={o.title}
-                    value={s.defaults[o.key] as boolean}
-                    onChange={(v) => setDefault({ [o.key]: v })}
+                    label={t.settings.options[key].title}
+                    value={s.defaults[key] as boolean}
+                    onChange={(v) => setDefault({ [key]: v })}
                   />
                 }
               />
@@ -128,46 +132,55 @@ export default function Settings() {
       )}
 
       <Row
-        title="Show “How to write”"
-        detail="A small guide on the session screen"
+        title={t.settings.showHowTo}
+        detail={t.settings.showHowToHint}
         right={
           <Toggle
-            label="Show How to write"
+            label={t.settings.showHowTo}
             value={s.showHowToWrite}
             onChange={(v) => updateSettings({ showHowToWrite: v })}
           />
         }
       />
       <Row
-        title="Notice the shift"
-        detail="Invite me to notice what changed after a session"
+        title={t.settings.noticeShift}
+        detail={t.settings.noticeShiftHint}
         last
         right={
-          <Toggle label="Notice the shift" value={s.noticeShift} onChange={(v) => updateSettings({ noticeShift: v })} />
+          <Toggle
+            label={t.settings.noticeShift}
+            value={s.noticeShift}
+            onChange={(v) => updateSettings({ noticeShift: v })}
+          />
         }
       />
       <Hairline />
 
-      <SectionLabel>Privacy & security</SectionLabel>
+      <SectionLabel>{t.settings.privacy}</SectionLabel>
       <Hairline />
       <Row
-        title="PIN lock"
-        detail={s.pinEnabled ? 'On' : 'Off'}
+        title={t.settings.pin}
+        detail={s.pinEnabled ? t.settings.on : t.settings.off}
         onPress={() => router.push('/settings/pin')}
       />
-      <Row title="Your data" detail="What is stored and where" onPress={() => router.push('/settings/privacy')} last />
+      <Row
+        title={t.settings.data}
+        detail={t.settings.dataHint}
+        onPress={() => router.push('/settings/privacy')}
+        last
+      />
       <Hairline />
 
-      <SectionLabel>Account</SectionLabel>
+      <SectionLabel>{t.settings.account}</SectionLabel>
       <Hairline />
       <View style={styles.field}>
         <T variant="small" tone="faint">
-          Name
+          {t.settings.name}
         </T>
         <TextInput
           value={s.name}
           onChangeText={(name) => updateSettings({ name })}
-          placeholder="Your first name"
+          placeholder={t.settings.namePlaceholder}
           placeholderTextColor={c.inkFaint}
           style={[styles.input, { color: c.ink }]}
         />
@@ -175,12 +188,12 @@ export default function Settings() {
       <Hairline />
       <View style={styles.field}>
         <T variant="small" tone="faint">
-          Email
+          {t.settings.email}
         </T>
         <TextInput
           value={s.email}
           onChangeText={(email) => updateSettings({ email })}
-          placeholder="you@example.com"
+          placeholder={t.settings.emailPlaceholder}
           placeholderTextColor={c.inkFaint}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -188,11 +201,16 @@ export default function Settings() {
         />
       </View>
       <Hairline />
-      <Row title="Subscription" detail="Plan, renewal and how to cancel" onPress={() => router.push('/settings/subscription')} last />
+      <Row
+        title={t.settings.subscription}
+        detail={t.settings.subscriptionHint}
+        onPress={() => router.push('/settings/subscription')}
+        last
+      />
       <Hairline />
 
       <T variant="label" center style={{ marginTop: space.xxl }}>
-        Unload · 1.0
+        {t.settings.version}
       </T>
     </Screen>
   );

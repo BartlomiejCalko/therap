@@ -11,13 +11,13 @@ import Animated, {
 import Svg, { Circle, Defs, LinearGradient, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import {
-  DAY_PART_LABEL,
   DAY_WINDOW_PHOTOS,
   SCENES,
   dayPart,
   type DayPart,
   type WindowPhoto,
 } from '@/content/dayWindow';
+import { useT } from '@/i18n';
 import { timeOfDay } from '@/lib/date';
 import { useTheme } from '@/theme/theme';
 import { fonts } from '@/theme/tokens';
@@ -171,6 +171,7 @@ function PhotoScrim({ ink }: { ink: 'dark' | 'light' }) {
 // The Today window: a scene for the current part of the day, with the greeting in its sky.
 export function DayWindow({ now, title, subtitle }: { now: Date; title: string; subtitle: string }) {
   const { c, scheme } = useTheme();
+  const t = useT();
   const part = dayPart(now);
   const photos = DAY_WINDOW_PHOTOS[part] ?? [];
   // Same photo all day, a different one tomorrow.
@@ -212,7 +213,7 @@ export function DayWindow({ now, title, subtitle }: { now: Date; title: string; 
 
       <View style={styles.text}>
         <T variant="label" style={[{ color: photo ? text.soft : text.faint }, halo]}>
-          {DAY_PART_LABEL[part]} · {timeOfDay(now.getTime())}
+          {t.today.parts[part]} · {timeOfDay(now.getTime())}
         </T>
         <T variant="display" style={[styles.title, { color: text.ink }, halo]}>
           {title}

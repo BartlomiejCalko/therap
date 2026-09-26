@@ -5,34 +5,37 @@ import { View } from 'react-native';
 import { PIN_LENGTH, PinDots, PinPad } from '@/components/PinPad';
 import { T } from '@/components/T';
 import { CircleButton, PillButton, Screen, TopBar } from '@/components/ui';
+import { useT } from '@/i18n';
 import { done } from '@/lib/haptics';
 import { checkPin, clearPin, savePin } from '@/lib/pin';
 import { useStore } from '@/store/store';
 import { space } from '@/theme/tokens';
 
 type Step = 'menu' | 'verify' | 'new' | 'confirm';
+type PinError = '' | 'mismatch' | 'different';
 
 const leave = () => (router.canGoBack() ? router.back() : router.replace('/settings'));
 
 export default function PinSettings() {
+  const t = useT();
   const { data, updateSettings } = useStore();
   const enabled = data.settings.pinEnabled;
   const [step, setStep] = useState<Step>(enabled ? 'menu' : 'new');
   const [intent, setIntent] = useState<'change' | 'off'>('change');
   const [entry, setEntry] = useState('');
   const [first, setFirst] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<PinError>('');
 
   const titles: Record<Step, string> = {
-    menu: 'PIN lock is on',
-    verify: 'Enter your current PIN',
-    new: 'Choose a 4-digit PIN',
-    confirm: 'Enter it once more',
+    menu: t.pin.menu,
+    verify: t.pin.verify,
+    new: t.pin.choose,
+    confirm: t.pin.confirm,
   };
 
   const complete = async (pin: string) => {
     if (step === 'verify') {
-      if (!(await checkPin(pin))) return fail('That PIN does not match.');
+      if (!(await checkPin(pin))) return fail('mismatch');
       if (intent === 'off') {
         await clearPin();
         updateSettings({ pinEnabled: false });
@@ -47,7 +50,7 @@ export default function PinSettings() {
     } else if (step === 'confirm') {
       if (pin !== first) {
         setStep('new');
-        return fail('The two PINs were different. Try again.');
+        return fail('different');
       }
       await savePin(pin);
       updateSettings({ pinEnabled: true });
@@ -58,8 +61,8 @@ export default function PinSettings() {
     setEntry('');
   };
 
-  const fail = (message: string) => {
-    setError(message);
+  const fail = (reason: Exclude<PinError, ''>) => {
+    setError(reason);
     setTimeout(() => setEntry(''), 300);
   };
 
@@ -72,28 +75,25 @@ export default function PinSettings() {
 
   return (
     <Screen edges={['top', 'bottom']}>
-      <TopBar left={<CircleButton icon="back" label="Back" onPress={leave} />} />
+      <TopBar left={<CircleButton icon="back" label={t.common.back} onPress={leave} />} />
       <T variant="title" center style={{ marginTop: space.lg }}>
         {titles[step]}
       </T>
       <T variant="small" tone={error ? 'accent' : 'faint'} center style={{ marginTop: space.sm, minHeight: 18 }}>
-        {error ||
-          (step === 'menu'
-            ? 'Unload asks for it when you open the app.'
-            : 'Keep your sessions private on this device.')}
+        {error ? t.pin[error] : step === 'menu' ? t.pin.menuHint : t.pin.hint}
       </T>
 
       {step === 'menu' ? (
         <View style={{ gap: 10, marginTop: space.xxl }}>
           <PillButton
-            title="Change PIN"
+            title={t.pin.change}
             onPress={() => {
               setIntent('change');
               setStep('verify');
             }}
           />
           <PillButton
-            title="Turn off PIN"
+            title={t.pin.turnOff}
             kind="secondary"
             onPress={() => {
               setIntent('off');
