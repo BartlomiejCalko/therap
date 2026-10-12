@@ -2,20 +2,16 @@ import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { SessionTile } from '@/components/Cards';
-import { DayWindow } from '@/components/DayWindow';
 import { Icon } from '@/components/Icon';
 import { T } from '@/components/T';
-import { CircleButton, Screen, SectionLabel } from '@/components/ui';
-import { CHECKIN_STATES, type CheckinState } from '@/content/copy';
+import { CircleButton, Hairline, Screen, SectionLabel } from '@/components/ui';
+import { CHECKIN_STATES } from '@/content/copy';
 import { useT } from '@/i18n';
 import { tap } from '@/lib/haptics';
 import { useNow } from '@/lib/useNow';
 import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
-import { fonts, space, type Palette } from '@/theme/tokens';
-
-const stateTone = (c: Palette, id: CheckinState) =>
-  ({ 'too-much': c.pastel.peach, scattered: c.pastel.lavender, stuck: c.pastel.sage, weighing: c.pastel.mist })[id];
+import { fonts, space } from '@/theme/tokens';
 
 export default function Today() {
   const { c } = useTheme();
@@ -32,36 +28,50 @@ export default function Today() {
         <CircleButton icon="settings" label={t.common.settings} onPress={() => router.push('/settings')} />
       </View>
 
-      <DayWindow
-        now={now}
-        title={`${t.dates.greeting(now.getHours())}${firstName ? `,\n${firstName}` : ''}`}
-        subtitle={t.today.subtitle}
-      />
+      {/* The greeting sits on the paper itself — type and space instead of a picture card. */}
+      {/* With a name, the greeting steps back and the name carries the weight. */}
+      <View style={styles.greeting}>
+        {firstName ? (
+          <>
+            <T variant="title" tone="soft" style={styles.greetingLead}>
+              {t.dates.greeting(now.getHours())},
+            </T>
+            <T variant="display" style={styles.greetingName}>
+              {firstName}
+            </T>
+          </>
+        ) : (
+          <T variant="display" style={styles.greetingName}>
+            {t.dates.greeting(now.getHours())}
+          </T>
+        )}
+        <T variant="italic" tone="soft" style={{ marginTop: space.md }}>
+          {t.today.subtitle}
+        </T>
+      </View>
 
-      <T variant="heading" style={styles.question}>
+      <T variant="label" style={styles.question}>
         {t.today.question}
       </T>
-      <View style={styles.grid}>
+      <View>
         {CHECKIN_STATES.map((state) => (
-          <Pressable
-            key={state}
-            accessibilityRole="button"
-            onPress={() => {
-              tap();
-              router.push({ pathname: '/checkin', params: { state } });
-            }}
-            style={({ pressed }) => [
-              styles.stateTile,
-              { backgroundColor: stateTone(c, state), opacity: pressed ? 0.7 : 1 },
-            ]}>
-            <T variant="serif" style={styles.stateText}>
-              {t.states[state]}
-            </T>
-            <View style={[styles.miniCircle, { backgroundColor: c.veil }]}>
-              <Icon name="arrow" size={14} />
-            </View>
-          </Pressable>
+          <View key={state}>
+            <Hairline />
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => {
+                tap();
+                router.push({ pathname: '/checkin', params: { state } });
+              }}
+              style={({ pressed }) => [styles.stateRow, { opacity: pressed ? 0.5 : 1 }]}>
+              <T variant="heading" style={styles.stateText}>
+                {t.states[state]}
+              </T>
+              <Icon name="arrow" size={18} color={c.inkFaint} />
+            </Pressable>
+          </View>
         ))}
+        <Hairline />
       </View>
 
       <View style={styles.actions}>
@@ -158,27 +168,13 @@ const styles = StyleSheet.create({
     marginTop: space.sm,
     marginBottom: space.md,
   },
-  question: { marginTop: space.xl, marginBottom: space.md },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  stateTile: {
-    width: '48.5%',
-    flexGrow: 1,
-    minHeight: 124,
-    borderRadius: 22,
-    padding: 16,
-    gap: 12,
-    justifyContent: 'space-between',
-  },
-  stateText: { fontFamily: fonts.serifLight, fontSize: 20, lineHeight: 25 },
-  miniCircle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    alignSelf: 'flex-end',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actions: { flexDirection: 'row', gap: 10, marginTop: 10 },
+  greeting: { marginTop: space.lg, marginBottom: space.sm },
+  greetingLead: { fontSize: 26, lineHeight: 32, letterSpacing: -0.3 },
+  greetingName: { fontSize: 52, lineHeight: 58, letterSpacing: -1.2, marginTop: 2 },
+  question: { marginTop: space.xxl, marginBottom: space.md },
+  stateRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: 19 },
+  stateText: { flex: 1, fontFamily: fonts.serifLight, fontSize: 23, lineHeight: 29 },
+  actions: { flexDirection: 'row', gap: 10, marginTop: space.xl },
   actionCard: { height: 124, borderRadius: 22, padding: 16, justifyContent: 'space-between' },
   waiting: {
     flexDirection: 'row',
