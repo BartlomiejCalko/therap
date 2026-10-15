@@ -28,6 +28,7 @@ export function Screen({
   scroll = true,
   withTabBar = false,
   texture = false,
+  header,
   contentStyle,
   edges = ['top'],
   ...scrollProps
@@ -36,6 +37,8 @@ export function Screen({
   scroll?: boolean;
   withTabBar?: boolean;
   texture?: boolean;
+  // Stays put above the scrolling content.
+  header?: ReactNode;
   contentStyle?: StyleProp<ViewStyle>;
   edges?: ('top' | 'bottom')[];
 } & ScrollViewProps) {
@@ -44,6 +47,7 @@ export function Screen({
   return (
     <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: c.bg }}>
       {texture && <PaperTexture />}
+      {header}
       {scroll ? (
         <ScrollView
           {...scrollProps}

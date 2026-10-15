@@ -130,6 +130,14 @@ export const en = {
     seeAll: 'See all',
     empty: 'Your sessions will rest here.',
     parts: { morning: 'Morning', afternoon: 'Afternoon', evening: 'Evening', night: 'Night' },
+    invite: 'Start with whatever feels closest. You can name it in a word.',
+    profile: 'Profile and settings',
+    stateLines: {
+      'too-much': 'Put it down, one thing at a time',
+      scattered: 'Gather the threads in one place',
+      stuck: "Name what's holding you",
+      weighing: 'Give the weight somewhere to go',
+    },
   },
 
   checkin: {

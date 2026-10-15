@@ -25,8 +25,9 @@ export const palettes: Record<'light' | 'dark', Palette> = {
     bg: '#F3F1EC',
     surface: '#FBFAF7',
     surfaceAlt: '#E8E5DE',
-    ink: '#1B1A18',
-    inkSoft: '#5E5B55',
+    // A warm charcoal rather than near-black, so dark elements sit on the paper instead of punching through it.
+    ink: '#2E2B27',
+    inkSoft: '#625E57',
     inkFaint: '#9C988F',
     hairline: 'rgba(27,26,24,0.12)',
     accent: '#B5462F',

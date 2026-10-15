@@ -149,6 +149,14 @@ export const pl: Dict = {
     seeAll: 'Wszystkie',
     empty: 'Tu odpoczną twoje sesje.',
     parts: { morning: 'Rano', afternoon: 'Popołudnie', evening: 'Wieczór', night: 'Noc' },
+    invite: 'Zacznij od tego, co najbliżej. Wystarczy jedno słowo.',
+    profile: 'Profil i ustawienia',
+    stateLines: {
+      'too-much': 'Odłóż to, rzecz po rzeczy',
+      scattered: 'Zbierz wątki w jednym miejscu',
+      stuck: 'Nazwij, co cię zatrzymuje',
+      weighing: 'Daj temu ciężarowi miejsce',
+    },
   },
 
   checkin: {
