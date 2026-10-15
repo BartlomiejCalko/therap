@@ -62,7 +62,7 @@ function caretColumn(text: string, cols: number) {
   }
   return Math.min(line.length, cols);
 }
-// Space kept on the paper below the rail for the companion phrase and Finish.
+// Space kept on the paper below the rail for the companion phrase and, once time is up, Finish.
 const FOOT = 112;
 
 // Companion phrases change on a slow rhythm, or sooner when the writer pauses.
@@ -333,13 +333,16 @@ export default function Write() {
                       <T variant="typeSmall" tone="faint">
                         {sound !== 'none' ? t.common.words(words) : ''}
                       </T>
-                      <PillButton
-                        title={t.write.finish}
-                        kind={timeUp ? 'primary' : 'secondary'}
-                        onPress={finish}
-                        disabled={!text.trim()}
-                        style={{ height: 42 }}
-                      />
+                      {/* No Finish while the time runs: nothing should invite leaving early.
+                          Ending before time stays possible through the close button. */}
+                      {timeUp && (
+                        <PillButton
+                          title={t.write.finish}
+                          onPress={finish}
+                          disabled={!text.trim()}
+                          style={{ height: 42 }}
+                        />
+                      )}
                     </View>
                   </View>
                 </>
