@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { SESSIONS } from '@/content/copy';
 import { useT } from '@/i18n';
@@ -10,6 +10,7 @@ import { useTheme } from '@/theme/theme';
 import { radius, space } from '@/theme/tokens';
 
 import { toneFor } from './Cards';
+import { InkPress } from './motion';
 import { SessionMark } from './SessionMark';
 import { T } from './T';
 import { TextLink } from './ui';
@@ -34,7 +35,7 @@ export function ChooseSession({ ctx }: { ctx: FlowContext }) {
       {capture && (
         <View style={[styles.context, { backgroundColor: c.surface, borderColor: c.hairline }]}>
           <T variant="label">{t.choose.unloading}</T>
-          <T variant="italic" style={{ marginTop: 6, fontSize: 18, lineHeight: 25 }}>
+          <T variant="type" style={{ marginTop: 6 }}>
             {capture.text}
           </T>
         </View>
@@ -53,18 +54,17 @@ export function ChooseSession({ ctx }: { ctx: FlowContext }) {
         {SESSIONS.map((s) => {
           const copy = t.sessions[s.id];
           return (
-            <Pressable
+            <InkPress
               key={s.id}
               accessibilityRole="button"
               accessibilityLabel={t.choose.a11y(copy.name, s.minutes, copy.line)}
+              inkColor={c.ink}
+              containerStyle={styles.tileSlot}
               onPress={() => {
                 tap();
                 beginSession(s.id, ctx, data.settings);
               }}
-              style={({ pressed }) => [
-                styles.tile,
-                { backgroundColor: toneFor(c, s.id), opacity: pressed ? 0.75 : 1 },
-              ]}>
+              style={[styles.tile, { backgroundColor: toneFor(c, s.id) }]}>
               <View style={styles.tileTop}>
                 <SessionMark type={s.id} size={36} />
                 <T variant="label" tone="soft">
@@ -79,7 +79,7 @@ export function ChooseSession({ ctx }: { ctx: FlowContext }) {
                   {copy.line}
                 </T>
               </View>
-            </Pressable>
+            </InkPress>
           );
         })}
       </View>
@@ -105,9 +105,8 @@ const styles = StyleSheet.create({
     padding: space.md,
   },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: space.lg },
+  tileSlot: { width: '48.5%', flexGrow: 1 },
   tile: {
-    width: '48.5%',
-    flexGrow: 1,
     aspectRatio: 0.78,
     borderRadius: radius.card,
     padding: 16,

@@ -10,6 +10,7 @@ import { radius, space, type Palette } from '@/theme/tokens';
 
 import { Icon } from './Icon';
 import { SessionMark } from './SessionMark';
+import { InkPress } from './motion';
 import { T } from './T';
 
 export const toneFor = (c: Palette, type: SessionType) =>
@@ -27,15 +28,14 @@ export function SessionTile({
   const { c } = useTheme();
   const t = useT();
   return (
-    <Pressable
+    <InkPress
+      accessibilityRole="button"
+      inkColor={c.ink}
       onPress={() => {
         tap();
         onPress();
       }}
-      style={({ pressed }) => [
-        styles.tile,
-        { width, backgroundColor: toneFor(c, session.type), opacity: pressed ? 0.75 : 1 },
-      ]}>
+      style={[styles.tile, { width, backgroundColor: toneFor(c, session.type) }]}>
       <SessionMark type={session.type} size={26} />
       <View style={{ flex: 1, marginTop: space.md }}>
         {session.released ? (
@@ -43,7 +43,7 @@ export function SessionTile({
             {t.common.letGo}
           </T>
         ) : (
-          <T variant="serifSmall" numberOfLines={5} style={{ fontSize: 15, lineHeight: 21 }}>
+          <T variant="typeSmall" numberOfLines={6} style={{ fontSize: 13, lineHeight: 19 }}>
             {session.text}
           </T>
         )}
@@ -51,7 +51,7 @@ export function SessionTile({
       <T variant="label" style={{ marginTop: space.sm }}>
         {t.sessions[session.type].name} · {t.dates.weekdayShort(new Date(session.startedAt))}
       </T>
-    </Pressable>
+    </InkPress>
   );
 }
 
@@ -75,7 +75,7 @@ export function CaptureCard({
           <Icon name="more" size={18} color={c.inkFaint} />
         </Pressable>
       </View>
-      <T variant="serifSmall" tone={explored ? 'soft' : 'ink'} style={{ marginTop: space.sm }}>
+      <T variant="typeSmall" tone={explored ? 'soft' : 'ink'} style={{ marginTop: space.sm }}>
         {capture.text}
       </T>
       {explored ? (
@@ -102,7 +102,7 @@ export function CaptureCard({
 }
 
 // Rough height guess used to balance the masonry columns.
-export const estimateCapture = (capture: Capture) => 90 + Math.ceil(capture.text.length / 18) * 23;
+export const estimateCapture = (capture: Capture) => 90 + Math.ceil(capture.text.length / 16) * 21;
 
 const styles = StyleSheet.create({
   tile: { height: 200, borderRadius: radius.card, padding: 14 },

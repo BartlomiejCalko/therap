@@ -6,6 +6,7 @@ import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
@@ -13,10 +14,11 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { toneFor } from '@/components/Cards';
 import { Enso } from '@/components/Enso';
+import { Dissolve } from '@/components/motion';
 import { T } from '@/components/T';
 import { FadeIn, PillButton, Screen, TextLink } from '@/components/ui';
 import { useT } from '@/i18n';
-import { soft } from '@/lib/haptics';
+import { done, soft } from '@/lib/haptics';
 import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
 import { radius, space } from '@/theme/tokens';
@@ -30,22 +32,30 @@ export default function Complete() {
   const { data, releaseSession } = useStore();
   const session = data.sessions.find((s) => s.id === id);
   const [choice, setChoice] = useState<'open' | 'kept' | 'released'>('open');
+  const [dissolving, setDissolving] = useState(false);
 
   const y = useSharedValue(0);
   const fade = useSharedValue(1);
+  const paper = useSharedValue(1);
 
+  // The words lift off the card and disperse; the card itself thins out a moment later.
   const letGo = () => {
+    if (dissolving) return;
     soft();
-    y.value = withTiming(-260, { duration: 900, easing: Easing.in(Easing.cubic) });
-    fade.value = withTiming(0, { duration: 800 });
-    setTimeout(() => {
-      if (session) releaseSession(session.id);
-      setChoice('released');
-    }, 850);
+    setDissolving(true);
+    y.value = withSpring(0);
+    fade.value = withTiming(1, { duration: 200 });
+    paper.value = withDelay(900, withTiming(0, { duration: 900, easing: Easing.out(Easing.quad) }));
+  };
+
+  const released = () => {
+    done();
+    if (session) releaseSession(session.id);
+    setChoice('released');
   };
 
   const pan = Gesture.Pan()
-    .enabled(choice === 'open')
+    .enabled(choice === 'open' && !dissolving)
     .onUpdate((e) => {
       y.value = Math.min(0, e.translationY);
       fade.value = 1 + Math.max(-0.7, e.translationY / 300);
@@ -63,6 +73,7 @@ export default function Complete() {
     opacity: fade.value,
     transform: [{ translateY: y.value }, { scale: 1 + y.value / 2600 }],
   }));
+  const cardPaper = useAnimatedStyle(() => ({ opacity: paper.value }));
 
   if (!session) return null;
   const minutes = Math.max(1, Math.round((session.endedAt - session.startedAt) / 60000));
@@ -86,19 +97,38 @@ export default function Complete() {
         {choice === 'open' ? (
           <>
             <GestureDetector gesture={pan}>
-              <Animated.View style={[styles.card, { backgroundColor: toneFor(c, session.type) }, card]}>
-                <T variant="label">{t.complete.unloaded}</T>
-                <T variant="serifSmall" numberOfLines={7} style={{ marginTop: space.sm }}>
-                  {session.text}
-                </T>
-                <T variant="small" tone="faint" center style={{ marginTop: space.md }}>
-                  {t.complete.swipe}
-                </T>
+              <Animated.View style={[styles.card, card]}>
+                <Animated.View
+                  style={[StyleSheet.absoluteFill, styles.cardPaper, { backgroundColor: toneFor(c, session.type) }, cardPaper]}
+                />
+                <Animated.View style={cardPaper}>
+                  <T variant="label">{t.complete.unloaded}</T>
+                </Animated.View>
+                <View style={{ marginTop: space.sm }}>
+                  <Dissolve
+                    text={session.text}
+                    go={dissolving}
+                    onDone={released}
+                    variant="typeSmall"
+                    maxWords={60}
+                  />
+                </View>
+                <Animated.View style={cardPaper}>
+                  <T variant="small" tone="faint" center style={{ marginTop: space.md }}>
+                    {t.complete.swipe}
+                  </T>
+                </Animated.View>
               </Animated.View>
             </GestureDetector>
             <View style={styles.row}>
-              <PillButton title={t.complete.keep} kind="secondary" grow onPress={() => setChoice('kept')} />
-              <PillButton title={t.complete.letGo} grow onPress={letGo} />
+              <PillButton
+                title={t.complete.keep}
+                kind="secondary"
+                grow
+                disabled={dissolving}
+                onPress={() => setChoice('kept')}
+              />
+              <PillButton title={t.complete.letGo} grow disabled={dissolving} onPress={letGo} />
             </View>
             <T variant="small" tone="faint" center style={{ marginTop: space.md }}>
               {t.complete.note}
@@ -130,7 +160,8 @@ export default function Complete() {
 
 const styles = StyleSheet.create({
   hero: { alignItems: 'center', paddingTop: space.xxl, paddingBottom: space.xl },
-  card: { borderRadius: radius.card, padding: 18 },
+  card: { padding: 18 },
+  cardPaper: { borderRadius: radius.card },
   row: { flexDirection: 'row', gap: 10, marginTop: space.md },
   after: { flex: 1, justifyContent: 'center', paddingVertical: space.xl },
 });

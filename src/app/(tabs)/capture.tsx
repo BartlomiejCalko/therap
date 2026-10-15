@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
+import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { StyleSheet, TextInput, View } from 'react-native';
 
 import { CaptureCard, estimateCapture } from '@/components/Cards';
@@ -24,6 +25,8 @@ export default function CaptureTab() {
   const [filter, setFilter] = useState<Filter>('all');
   const [menu, setMenu] = useState<Capture | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
+  // Only thoughts saved while this screen is open drop in; the existing stack just appears.
+  const [openedAt] = useState(() => Date.now());
 
   const list = data.captures.filter((x) => filter === 'all' || x.status === filter);
   const groups = groupByDay(list, (x) => x.createdAt);
@@ -93,12 +96,16 @@ export default function CaptureTab() {
               items={g.items}
               estimate={estimateCapture}
               renderItem={(capture) => (
-                <CaptureCard
+                <Animated.View
                   key={capture.id}
-                  capture={capture}
-                  onUnload={() => unload(capture)}
-                  onMore={() => setMenu(capture)}
-                />
+                  entering={capture.createdAt > openedAt ? FadeInDown.springify().damping(18).stiffness(160) : undefined}
+                  layout={LinearTransition.springify().damping(20)}>
+                  <CaptureCard
+                    capture={capture}
+                    onUnload={() => unload(capture)}
+                    onMore={() => setMenu(capture)}
+                  />
+                </Animated.View>
               )}
             />
           </View>
@@ -145,9 +152,9 @@ const styles = StyleSheet.create({
     padding: space.md,
   },
   input: {
-    fontFamily: fonts.serif,
-    fontSize: 20,
-    lineHeight: 28,
+    fontFamily: fonts.type,
+    fontSize: 17,
+    lineHeight: 26,
     minHeight: 84,
     paddingVertical: space.sm,
     textAlignVertical: 'top',

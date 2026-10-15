@@ -62,6 +62,8 @@ export const fonts = {
   serifItalic: 'Newsreader_400Regular_Italic',
   sans: 'Inter_400Regular',
   sansMedium: 'Inter_500Medium',
+  // The person's own words are always set in typewriter type.
+  type: 'CourierPrime_400Regular',
 } as const;
 
 export const space = {

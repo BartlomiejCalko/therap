@@ -1,3 +1,4 @@
+import { CourierPrime_400Regular } from '@expo-google-fonts/courier-prime';
 import { Inter_400Regular, Inter_500Medium } from '@expo-google-fonts/inter';
 import {
   Newsreader_300Light,
@@ -36,6 +37,7 @@ export default function RootLayout() {
     Newsreader_400Regular_Italic,
     Inter_400Regular,
     Inter_500Medium,
+    CourierPrime_400Regular,
   });
 
   return (

@@ -84,7 +84,7 @@ export default function Entry() {
             {t.entry.released}
           </T>
         ) : (
-          <T variant="serif">{session.text}</T>
+          <T variant="type">{session.text}</T>
         )}
       </View>
 

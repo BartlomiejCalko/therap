@@ -44,7 +44,7 @@ export function SessionRow({ session, checkin }: { session: Session; checkin?: C
             {t.common.letGo}
           </T>
         ) : (
-          <T variant="serifSmall" tone="soft" numberOfLines={2}>
+          <T variant="typeSmall" tone="soft" numberOfLines={2}>
             {session.text}
           </T>
         )}

@@ -4,7 +4,8 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SessionTile } from '@/components/Cards';
 import { Icon } from '@/components/Icon';
 import { T } from '@/components/T';
-import { CircleButton, Hairline, Screen, SectionLabel } from '@/components/ui';
+import { InkPress, WriteIn } from '@/components/motion';
+import { CircleButton, FadeIn, Hairline, Screen, SectionLabel } from '@/components/ui';
 import { CHECKIN_STATES } from '@/content/copy';
 import { useT } from '@/i18n';
 import { tap } from '@/lib/haptics';
@@ -31,57 +32,71 @@ export default function Today() {
       {/* The greeting sits on the paper itself — type and space instead of a picture card. */}
       {/* With a name, the greeting steps back and the name carries the weight. */}
       <View style={styles.greeting}>
+        {/* The greeting writes itself in, word by word, then the name settles under it. */}
         {firstName ? (
           <>
-            <T variant="title" tone="soft" style={styles.greetingLead}>
-              {t.dates.greeting(now.getHours())},
-            </T>
-            <T variant="display" style={styles.greetingName}>
-              {firstName}
-            </T>
+            <WriteIn
+              text={`${t.dates.greeting(now.getHours())},`}
+              variant="title"
+              tone="soft"
+              style={styles.greetingLead}
+              delay={150}
+            />
+            <WriteIn text={firstName} variant="display" style={styles.greetingName} delay={450} />
           </>
         ) : (
-          <T variant="display" style={styles.greetingName}>
-            {t.dates.greeting(now.getHours())}
-          </T>
+          <WriteIn
+            text={t.dates.greeting(now.getHours())}
+            variant="display"
+            style={styles.greetingName}
+            delay={150}
+          />
         )}
-        <T variant="italic" tone="soft" style={{ marginTop: space.md }}>
-          {t.today.subtitle}
-        </T>
+        <FadeIn delay={950}>
+          <T variant="italic" tone="soft" style={{ marginTop: space.md }}>
+            {t.today.subtitle}
+          </T>
+        </FadeIn>
       </View>
 
       <T variant="label" style={styles.question}>
         {t.today.question}
       </T>
       <View>
-        {CHECKIN_STATES.map((state) => (
-          <View key={state}>
+        {CHECKIN_STATES.map((state, i) => (
+          <FadeIn key={state} delay={1150 + i * 70}>
             <Hairline />
-            <Pressable
+            <InkPress
               accessibilityRole="button"
+              inkColor={c.ink}
               onPress={() => {
                 tap();
                 router.push({ pathname: '/checkin', params: { state } });
               }}
-              style={({ pressed }) => [styles.stateRow, { opacity: pressed ? 0.5 : 1 }]}>
+              style={styles.stateRow}>
               <T variant="heading" style={styles.stateText}>
                 {t.states[state]}
               </T>
               <Icon name="arrow" size={18} color={c.inkFaint} />
-            </Pressable>
-          </View>
+            </InkPress>
+          </FadeIn>
         ))}
-        <Hairline />
+        <FadeIn delay={1150 + CHECKIN_STATES.length * 70}>
+          <Hairline />
+        </FadeIn>
       </View>
 
       <View style={styles.actions}>
-        <Pressable
+        <InkPress
           accessibilityRole="button"
+          inkColor={c.onInk}
+          inkOpacity={0.14}
+          containerStyle={{ flex: 1.2 }}
           onPress={() => {
             tap();
             router.push('/choose');
           }}
-          style={({ pressed }) => [styles.actionCard, { backgroundColor: c.ink, flex: 1.2, opacity: pressed ? 0.8 : 1 }]}>
+          style={[styles.actionCard, { backgroundColor: c.ink }]}>
           <Icon name="unload" size={24} color={c.onInk} />
           <View>
             <T variant="medium" tone="onInk">
@@ -91,16 +106,18 @@ export default function Today() {
               {t.today.chooseSessionHint}
             </T>
           </View>
-        </Pressable>
-        <Pressable
+        </InkPress>
+        <InkPress
           accessibilityRole="button"
+          inkColor={c.ink}
+          containerStyle={{ flex: 1 }}
           onPress={() => {
             tap();
             router.push('/how-to-write');
           }}
-          style={({ pressed }) => [
+          style={[
             styles.actionCard,
-            { backgroundColor: c.surface, borderColor: c.hairline, borderWidth: StyleSheet.hairlineWidth, flex: 1, opacity: pressed ? 0.7 : 1 },
+            { backgroundColor: c.surface, borderColor: c.hairline, borderWidth: StyleSheet.hairlineWidth },
           ]}>
           <T variant="label">{t.today.guideLabel}</T>
           <View>
@@ -109,7 +126,7 @@ export default function Today() {
               {t.today.guideHint}
             </T>
           </View>
-        </Pressable>
+        </InkPress>
       </View>
 
       {waiting > 0 && (

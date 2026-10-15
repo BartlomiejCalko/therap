@@ -64,8 +64,8 @@ export default function Checkin() {
 const styles = StyleSheet.create({
   body: { flex: 1, justifyContent: 'center' },
   input: {
-    fontFamily: fonts.serifLightItalic,
-    fontSize: 24,
+    fontFamily: fonts.type,
+    fontSize: 21,
     paddingVertical: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
     marginTop: space.sm,
