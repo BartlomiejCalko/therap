@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" id="Music-Note--Streamline-Solar" height="24" width="24">
+  <desc>
+    Music Note Streamline Icon: https://streamlinehq.com
+  </desc>
+  <g id="Line Duotone/Video Audio Sound/Music Note">
+    <path id="Vector" stroke="#737373" d="M9 19V8" stroke-width="1.5"></path>
+    <path id="Vector_2" stroke="#737373" d="M21 17V6" stroke-width="1.5"></path>
+    <path id="Vector_3" stroke="#000000" d="M9 19c0 1.6569 -1.34315 3 -3 3s-3 -1.3431 -3 -3 1.34315 -3 3 -3 3 1.3431 3 3Z" stroke-width="1.5"></path>
+    <path id="Vector_4" stroke="#000000" d="M21 17c0 1.6569 -1.3431 3 -3 3s-3 -1.3431 -3 -3 1.3431 -3 3 -3 3 1.3431 3 3Z" stroke-width="1.5"></path>
+    <path id="Vector_5" stroke="#000000" stroke-linecap="round" d="m15.7351 3.75466 -4 1.33333c-1.32 0.44002 -1.98007 0.66002 -2.35758 1.1838C9 6.79556 9 7.49128 9 8.88273v3.11697l12 -4.00001v-0.4503c0 -2.53246 0 -3.79869 -0.8306 -4.39733 -0.8306 -0.59865 -2.0318 -0.19823 -4.4343 0.6026Z" stroke-width="1.5"></path>
+  </g>
+</svg>
