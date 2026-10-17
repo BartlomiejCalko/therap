@@ -10,12 +10,11 @@ export const stateTone = (c: Palette, id: CheckinState) =>
 
 const line = (c: Palette) => ({ stroke: c.ink, strokeWidth: 1.4, fill: 'none', strokeLinecap: 'round' }) as const;
 
-// 64×64 drawings.
+// 64×64 line drawings, set straight on the card with no tile behind them.
 export function StateArt({ state, c, size = 64 }: { state: CheckinState; c: Palette; size?: number }) {
   const p = line(c);
   return (
     <Svg width={size} height={size} viewBox="0 0 64 64">
-      <Rect x={0} y={0} width={64} height={64} rx={14} fill={stateTone(c, state)} />
       {state === 'too-much' && (
         // A crowd of circles pressing into one another.
         <>
@@ -64,27 +63,18 @@ export function StateArt({ state, c, size = 64 }: { state: CheckinState; c: Pale
   );
 }
 
-// The banner behind "Choose a session": a calm horizon with the four session crests' circle motif.
+// The dawn behind "Choose a session": lavender sky warming to peach at the horizon.
 export function SessionBanner({ c, width, height }: { c: Palette; width: number; height: number }) {
   return (
-    <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+    <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
       <Defs>
-        <LinearGradient id="banner-sky" x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0" stopColor={c.pastel.mist} />
+        <LinearGradient id="banner-dawn" x1="0" y1="0" x2="0" y2="1">
+          <Stop offset="0" stopColor={c.pastel.lavender} />
+          <Stop offset="0.55" stopColor={c.pastel.peach} />
           <Stop offset="1" stopColor={c.pastel.peach} />
         </LinearGradient>
       </Defs>
-      <Rect x={0} y={0} width={width} height={height} fill="url(#banner-sky)" />
-      <Circle cx={width * 0.78} cy={height * 0.42} r={height * 0.16} fill={c.surface} opacity={0.75} />
-      <Path
-        d={`M0 ${height * 0.72} C ${width * 0.25} ${height * 0.6}, ${width * 0.45} ${height * 0.82}, ${width * 0.7} ${height * 0.68} S ${width} ${height * 0.7}, ${width} ${height * 0.66} L ${width} ${height} L 0 ${height} Z`}
-        fill={c.pastel.sage}
-      />
-      <Path
-        d={`M0 ${height * 0.86} C ${width * 0.3} ${height * 0.78}, ${width * 0.6} ${height * 0.94}, ${width} ${height * 0.82} L ${width} ${height} L 0 ${height} Z`}
-        fill={c.tones[2]}
-        opacity={0.9}
-      />
+      <Rect x={0} y={0} width={width} height={height} fill="url(#banner-dawn)" />
     </Svg>
   );
 }

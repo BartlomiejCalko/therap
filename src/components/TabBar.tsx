@@ -16,6 +16,7 @@ import { tap } from '@/lib/haptics';
 import { useTheme } from '@/theme/theme';
 import { fonts } from '@/theme/tokens';
 
+import { Glyph } from './Glyph';
 import { Icon, type IconName } from './Icon';
 
 const BAR_HEIGHT = 58;
@@ -150,11 +151,10 @@ function TabItem({
   const activeLayer = useAnimatedStyle(() => ({ opacity: on.value }));
   const idleLayer = useAnimatedStyle(() => ({ opacity: 1 - on.value }));
 
+  // The session tab carries the sunrise drawing, cropped to the sun and horizon.
   const glyph = (color: string) =>
     center ? (
-      <View style={[styles.center, { backgroundColor: c.ink }]}>
-        <Icon name={icon} size={17} color={c.onInk} />
-      </View>
+      <Glyph name="sunrise" size={30} crop={[8, 22, 48, 34]} weight={1.5} color={color} />
     ) : (
       <Icon name={icon} size={22} color={color} />
     );
@@ -207,6 +207,5 @@ const styles = StyleSheet.create({
   item: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   itemInner: { alignItems: 'center', justifyContent: 'center' },
   stack: { alignItems: 'center', justifyContent: 'flex-end' },
-  center: { width: 30, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
   label: { fontFamily: fonts.sansMedium, fontSize: 10.5, lineHeight: 13, marginTop: 4, letterSpacing: 0.1 },
 });

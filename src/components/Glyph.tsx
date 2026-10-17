@@ -16,19 +16,25 @@ export function Glyph({
   size = 48,
   color,
   weight,
+  crop,
 }: {
   name: GlyphName;
   size?: number;
   color?: string;
   // Multiplies every stroke; defaults to whatever keeps the main line at about one pixel.
   weight?: number;
+  // Part of the 64 grid to show, as [x, y, width, height]; `size` is then the width.
+  crop?: [number, number, number, number];
 }) {
   const { c } = useTheme();
   const ink = color ?? c.ink;
   const k = weight ?? Math.max(1, 47 / size);
 
   return (
-    <Svg width={size} height={size} viewBox="0 0 64 64">
+    <Svg
+      width={size}
+      height={crop ? (size * crop[3]) / crop[2] : size}
+      viewBox={crop ? crop.join(' ') : '0 0 64 64'}>
       {GLYPHS[name].map(([tag, props], i) => {
         const Shape = SHAPES[tag];
         const { strokeWidth = BASE_STROKE, stroke, fill, ...rest } = props;

@@ -138,6 +138,7 @@ export const pl: Dict = {
     question: 'Co masz teraz w głowie?',
     chooseSession: 'Wybierz sesję',
     chooseSessionHint: 'Od razu do pisania',
+    chooseSessionLine: 'Cztery długości ciszy, od 5 do 50 minut. Wybierz jedną i przelej myśli na kartkę.',
     guideLabel: 'Przewodnik',
     guideTitle: 'Jak pisać',
     guideHint: 'Zanim zaczniesz',

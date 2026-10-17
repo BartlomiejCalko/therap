@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { type SessionType } from '@/content/copy';
 import { useT } from '@/i18n';
@@ -55,25 +55,25 @@ export function SessionTile({
   );
 }
 
-export function CaptureCard({
-  capture,
-  onUnload,
-  onMore,
-}: {
-  capture: Capture;
-  onUnload: () => void;
-  onMore: () => void;
-}) {
+export function CaptureCard({ capture, onMore }: { capture: Capture; onMore: () => void }) {
   const { c } = useTheme();
   const t = useT();
   const explored = capture.status === 'explored';
   return (
-    <View style={[styles.capture, { backgroundColor: explored ? c.bg : c.surface, borderColor: c.hairline }]}>
+    // The whole card is one target: it opens the options — unload in a session, or delete.
+    <InkPress
+      accessibilityRole="button"
+      accessibilityLabel={capture.text}
+      accessibilityHint={t.common.moreOptions}
+      inkColor={c.ink}
+      onPress={() => {
+        tap();
+        onMore();
+      }}
+      style={[styles.capture, { backgroundColor: explored ? c.bg : c.surface, borderColor: c.hairline }]}>
       <View style={styles.captureTop}>
         <T variant="label">{timeOfDay(capture.createdAt)}</T>
-        <Pressable accessibilityLabel={t.common.moreOptions} hitSlop={10} onPress={onMore}>
-          <Icon name="more" size={18} color={c.inkFaint} />
-        </Pressable>
+        <Icon name="more" size={18} color={c.inkFaint} />
       </View>
       <T variant="typeSmall" tone={explored ? 'soft' : 'ink'} style={{ marginTop: space.sm }}>
         {capture.text}
@@ -84,20 +84,14 @@ export function CaptureCard({
           <T variant="label">{t.capture.explored}</T>
         </View>
       ) : (
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => {
-            tap();
-            onUnload();
-          }}
-          style={({ pressed }) => [styles.status, { opacity: pressed ? 0.5 : 1 }]}>
+        <View style={styles.status}>
           <T variant="medium" style={{ fontSize: 13 }}>
             {t.capture.unloadThis}
           </T>
           <Icon name="arrow" size={14} />
-        </Pressable>
+        </View>
       )}
-    </View>
+    </InkPress>
   );
 }
 

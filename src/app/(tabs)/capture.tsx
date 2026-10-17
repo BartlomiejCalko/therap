@@ -106,7 +106,6 @@ export default function CaptureTab() {
                   layout={LinearTransition.springify().damping(20)}>
                   <CaptureCard
                     capture={capture}
-                    onUnload={() => unload(capture)}
                     onMore={() => setMenu(capture)}
                   />
                 </Animated.View>
@@ -119,20 +118,19 @@ export default function CaptureTab() {
       <Sheet visible={!!menu} onClose={() => setMenu(null)} title={t.capture.sheetTitle}>
         {menu && (
           <View style={{ gap: 10 }}>
-            <T variant="italic" center style={{ marginBottom: space.md }}>
+            <T variant="type" center style={{ marginBottom: space.md }}>
               {menu.text}
             </T>
-            {menu.status === 'waiting' && (
-              <PillButton
-                title={t.capture.unloadThis}
-                icon="arrow"
-                onPress={() => {
-                  const target = menu;
-                  setMenu(null);
-                  unload(target);
-                }}
-              />
-            )}
+            {/* Explored thoughts can be unloaded again in a new session. */}
+            <PillButton
+              title={t.capture.unloadThis}
+              icon="arrow"
+              onPress={() => {
+                const target = menu;
+                setMenu(null);
+                unload(target);
+              }}
+            />
             <PillButton
               title={t.common.delete}
               kind="secondary"
@@ -141,6 +139,7 @@ export default function CaptureTab() {
                 setMenu(null);
               }}
             />
+            <PillButton title={t.common.cancel} kind="ghost" onPress={() => setMenu(null)} />
           </View>
         )}
       </Sheet>

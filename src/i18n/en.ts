@@ -122,6 +122,7 @@ export const en = {
     question: "What's on your mind right now?",
     chooseSession: 'Choose a session',
     chooseSessionHint: 'Straight to writing',
+    chooseSessionLine: 'Four lengths of quiet, from 5 to 50 minutes. Pick one and empty your head onto the page.',
     guideLabel: 'Guide',
     guideTitle: 'How to Unload',
     guideHint: 'Before you begin',

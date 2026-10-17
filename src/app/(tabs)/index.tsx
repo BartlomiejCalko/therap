@@ -6,18 +6,16 @@ import { SessionTile } from '@/components/Cards';
 import { Glyph } from '@/components/Glyph';
 import { Icon } from '@/components/Icon';
 import { InkPress } from '@/components/motion';
-import { SessionMark } from '@/components/SessionMark';
 import { SessionBanner, StateArt } from '@/components/StateArt';
 import { T } from '@/components/T';
 import { FadeIn, Screen, SectionLabel } from '@/components/ui';
-import { CHECKIN_STATES, SESSIONS } from '@/content/copy';
+import { CHECKIN_STATES } from '@/content/copy';
 import { useT } from '@/i18n';
 import { tap } from '@/lib/haptics';
 import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
 import { fonts, radius, space } from '@/theme/tokens';
 
-const BANNER_HEIGHT = 172;
 
 export default function Today() {
   const { c } = useTheme();
@@ -26,7 +24,7 @@ export default function Today() {
   const waiting = captures.filter((x) => x.status === 'waiting').length;
   const firstName = settings.name.trim();
   const [scrolled, setScrolled] = useState(false);
-  const [bannerWidth, setBannerWidth] = useState(0);
+  const [banner, setBanner] = useState({ w: 0, h: 0 });
 
   // A fixed bar, like Patreon's: the app's name, and the person as an avatar that opens their profile.
   const header = (
@@ -97,40 +95,42 @@ export default function Today() {
         ))}
       </View>
 
-      {/* Straight to a session: a picture card rather than a black block. */}
+      {/* Straight to a session: the sunrise from the tab bar, rising over a dawn wash. */}
       <FadeIn delay={600} style={{ marginTop: space.xl }}>
         <InkPress
           accessibilityRole="button"
-          accessibilityLabel={`${t.today.chooseSession}. ${t.today.chooseSessionHint}`}
+          accessibilityLabel={`${t.today.chooseSession}. ${t.today.chooseSessionLine}`}
           inkColor={c.ink}
           onPress={() => {
             tap();
             router.push('/choose');
           }}
           style={styles.banner}>
-          <View style={StyleSheet.absoluteFill} onLayout={(e) => setBannerWidth(e.nativeEvent.layout.width)}>
-            {bannerWidth > 0 && <SessionBanner c={c} width={bannerWidth} height={BANNER_HEIGHT} />}
+          {/* The dawn wash is sized to the card, which grows with its text. */}
+          <View
+            style={StyleSheet.absoluteFill}
+            onLayout={(e) => setBanner({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
+            {banner.w > 0 && <SessionBanner c={c} width={banner.w} height={banner.h} />}
           </View>
-          <View style={styles.bannerMarks}>
-            {SESSIONS.map((s) => (
-              <SessionMark key={s.id} type={s.id} size={28} color={c.inkSoft} />
-            ))}
+          <View pointerEvents="none" style={styles.bannerSun}>
+            <Glyph name="sunrise" size={112} crop={[8, 22, 48, 34]} weight={0.55} color={c.ink} />
           </View>
-          <View style={styles.bannerText}>
-            <T variant="heading" style={{ fontSize: 24, lineHeight: 30 }}>
-              {t.today.chooseSession}
+          <T variant="heading" center style={{ fontSize: 26, lineHeight: 32, marginTop: space.md }}>
+            {t.today.chooseSession}
+          </T>
+          <T variant="small" tone="soft" center style={styles.bannerLine}>
+            {t.today.chooseSessionLine}
+          </T>
+          <View style={styles.bannerHint}>
+            <T variant="medium" style={{ fontSize: 14 }}>
+              {t.today.chooseSessionHint}
             </T>
-            <View style={styles.bannerHint}>
-              <T variant="small" tone="soft">
-                {t.today.chooseSessionHint}
-              </T>
-              <Icon name="arrow" size={14} color={c.inkSoft} />
-            </View>
+            <Icon name="arrow" size={14} color={c.ink} />
           </View>
         </InkPress>
       </FadeIn>
 
-      <FadeIn delay={680} style={{ marginTop: 10 }}>
+      <FadeIn delay={680} style={{ marginTop: space.xl }}>
         <InkPress
           accessibilityRole="button"
           inkColor={c.ink}
@@ -178,7 +178,7 @@ export default function Today() {
       </SectionLabel>
       {sessions.length === 0 ? (
         <View style={[styles.empty, { borderColor: c.hairline }]}>
-          <Glyph name="sunrise" size={44} color={c.inkFaint} />
+          <Glyph name="arch" size={44} color={c.inkFaint} />
           <T variant="italic" tone="faint" center style={{ fontSize: 17 }}>
             {t.today.empty}
           </T>
@@ -230,10 +230,17 @@ const styles = StyleSheet.create({
     paddingRight: 12,
   },
   stateTitle: { fontFamily: fonts.serif, fontSize: 20, lineHeight: 25 },
-  banner: { height: BANNER_HEIGHT, borderRadius: 22 },
-  bannerMarks: { position: 'absolute', top: 16, left: 18, flexDirection: 'row', gap: 8, opacity: 0.8 },
-  bannerText: { position: 'absolute', left: 18, right: 18, bottom: 16 },
-  bannerHint: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
+  banner: {
+    borderRadius: 22,
+    overflow: 'hidden',
+    alignItems: 'center',
+    paddingTop: 26,
+    paddingBottom: 22,
+    paddingHorizontal: 28,
+  },
+  bannerSun: { opacity: 0.85 },
+  bannerLine: { marginTop: 6, maxWidth: 290 },
+  bannerHint: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: space.md },
   rowCard: {
     flexDirection: 'row',
     alignItems: 'center',
