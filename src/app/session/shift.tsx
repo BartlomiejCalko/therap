@@ -2,14 +2,17 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
+import { Glyph } from '@/components/Glyph';
 import { T } from '@/components/T';
 import { Chip, CircleButton, Hairline, PillButton, Screen, TopBar } from '@/components/ui';
 import { SHIFT_AREAS, SHIFT_VALUES, type ShiftArea, type ShiftValue } from '@/content/copy';
 import { useT } from '@/i18n';
 import { useStore } from '@/store/store';
+import { useTheme } from '@/theme/theme';
 import { space } from '@/theme/tokens';
 
 export default function Shift() {
+  const { c } = useTheme();
   const t = useT();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { setShift } = useStore();
@@ -24,7 +27,10 @@ export default function Shift() {
   return (
     <Screen edges={['top', 'bottom']}>
       <TopBar left={<CircleButton icon="back" label={t.common.back} onPress={() => router.back()} />} />
-      <T variant="display">{t.shift.title}</T>
+      <Glyph name="ginkgo" size={52} color={c.inkSoft} />
+      <T variant="display" style={{ marginTop: space.md }}>
+        {t.shift.title}
+      </T>
       <T variant="serif" tone="soft" style={{ marginTop: space.sm }}>
         {t.shift.intro}
       </T>

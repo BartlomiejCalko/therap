@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
+import { Glyph } from '@/components/Glyph';
 import { T } from '@/components/T';
 import { CircleButton, FadeIn, PillButton, Screen, TopBar } from '@/components/ui';
 import { useT } from '@/i18n';
@@ -17,7 +18,7 @@ export default function Affirmation() {
       <TopBar left={<CircleButton icon="back" label={t.common.back} onPress={() => router.back()} />} />
       <View style={styles.center}>
         <FadeIn>
-          <View style={[styles.rule, { backgroundColor: c.ink }]} />
+          <Glyph name="feather" size={56} color={c.inkSoft} />
         </FadeIn>
         <FadeIn delay={300}>
           <T variant="display" center style={{ fontSize: 34, lineHeight: 42 }}>
@@ -38,5 +39,4 @@ export default function Affirmation() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: space.xl, paddingHorizontal: space.sm },
-  rule: { width: 28, height: 1 },
 });

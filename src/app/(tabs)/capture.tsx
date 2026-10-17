@@ -4,6 +4,7 @@ import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated'
 import { StyleSheet, TextInput, View } from 'react-native';
 
 import { CaptureCard, estimateCapture } from '@/components/Cards';
+import { Glyph } from '@/components/Glyph';
 import { T } from '@/components/T';
 import { Chip, Masonry, PillButton, Screen, SectionLabel, Sheet } from '@/components/ui';
 import { useT } from '@/i18n';
@@ -83,9 +84,12 @@ export default function CaptureTab() {
       </View>
 
       {groups.length === 0 ? (
-        <T variant="italic" tone="faint" center style={{ marginTop: space.xl, fontSize: 17 }}>
-          {t.capture.empty}
-        </T>
+        <View style={{ alignItems: 'center', marginTop: space.xl, gap: space.md }}>
+          <Glyph name="cloud" size={64} color={c.inkFaint} />
+          <T variant="italic" tone="faint" center style={{ fontSize: 17 }}>
+            {t.capture.empty}
+          </T>
+        </View>
       ) : (
         groups.map((g) => (
           <View key={g.key} style={{ marginTop: space.lg }}>

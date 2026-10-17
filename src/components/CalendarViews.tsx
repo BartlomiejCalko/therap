@@ -10,6 +10,7 @@ import type { Checkin, Session } from '@/store/types';
 import { useTheme } from '@/theme/theme';
 import { space } from '@/theme/tokens';
 
+import { Glyph } from './Glyph';
 import { SessionMark } from './SessionMark';
 import { T } from './T';
 import { CircleButton, Hairline, SectionLabel } from './ui';
@@ -73,10 +74,14 @@ function SessionList({ sessions, checkins }: { sessions: Session[]; checkins: Ch
 }
 
 function EmptyNote({ children }: { children: string }) {
+  const { c } = useTheme();
   return (
-    <T variant="italic" tone="faint" center style={{ marginTop: space.xl, fontSize: 17 }}>
-      {children}
-    </T>
+    <View style={{ alignItems: 'center', marginTop: space.xl, gap: space.md }}>
+      <Glyph name="moon" size={56} color={c.inkFaint} />
+      <T variant="italic" tone="faint" center style={{ fontSize: 17 }}>
+        {children}
+      </T>
+    </View>
   );
 }
 

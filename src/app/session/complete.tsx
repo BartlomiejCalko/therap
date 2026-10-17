@@ -14,6 +14,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { toneFor } from '@/components/Cards';
 import { Enso } from '@/components/Enso';
+import { Glyph } from '@/components/Glyph';
 import { Dissolve } from '@/components/motion';
 import { T } from '@/components/T';
 import { FadeIn, PillButton, Screen, TextLink } from '@/components/ui';
@@ -136,6 +137,7 @@ export default function Complete() {
           </>
         ) : (
           <FadeIn style={styles.after}>
+            <Glyph name={choice === 'released' ? 'flame' : 'letter'} size={56} color={c.inkSoft} />
             <T variant="italic" center style={{ fontSize: 22, lineHeight: 30 }}>
               {choice === 'released' ? t.complete.released : t.complete.kept}
             </T>
@@ -163,5 +165,5 @@ const styles = StyleSheet.create({
   card: { padding: 18 },
   cardPaper: { borderRadius: radius.card },
   row: { flexDirection: 'row', gap: 10, marginTop: space.md },
-  after: { flex: 1, justifyContent: 'center', paddingVertical: space.xl },
+  after: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: space.md, paddingVertical: space.xl },
 });

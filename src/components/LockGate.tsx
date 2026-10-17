@@ -7,6 +7,7 @@ import { checkPin } from '@/lib/pin';
 import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
 
+import { Glyph } from './Glyph';
 import { PIN_LENGTH, PinDots, PinPad } from './PinPad';
 import { T } from './T';
 
@@ -54,6 +55,9 @@ export function LockGate({ children }: { children: ReactNode }) {
       {locked && (
         <SafeAreaView
           style={[StyleSheet.absoluteFill, { backgroundColor: c.bg, justifyContent: 'center', zIndex: 100, elevation: 100 }]}>
+          <View style={{ alignItems: 'center', marginBottom: 16 }}>
+            <Glyph name="key" size={48} color={c.inkSoft} />
+          </View>
           <T variant="label" center>
             Unload
           </T>

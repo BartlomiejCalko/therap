@@ -1,12 +1,15 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { View } from 'react-native';
 
+import { Glyph } from '@/components/Glyph';
 import { T } from '@/components/T';
 import { CircleButton, Hairline, PillButton, Screen, TopBar } from '@/components/ui';
 import { useT } from '@/i18n';
+import { useTheme } from '@/theme/theme';
 import { space } from '@/theme/tokens';
 
 export default function HowToWrite() {
+  const { c } = useTheme();
   const t = useT();
   const { from } = useLocalSearchParams<{ from?: string }>();
   return (
@@ -16,7 +19,8 @@ export default function HowToWrite() {
         right={<CircleButton icon="close" label={t.common.close} onPress={() => router.back()} />}
       />
 
-      <View style={{ gap: space.md, marginTop: space.md }}>
+      <Glyph name="pen" size={52} color={c.inkSoft} />
+      <View style={{ gap: space.md, marginTop: space.lg }}>
         {t.howTo.paragraphs.map((p, i) => (
           <T key={i} variant={i === 0 ? 'heading' : 'serif'} tone={i === 0 ? 'ink' : 'soft'}>
             {p}

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { SessionTile } from '@/components/Cards';
+import { Glyph } from '@/components/Glyph';
 import { Icon } from '@/components/Icon';
 import { InkPress } from '@/components/motion';
 import { SessionMark } from '@/components/SessionMark';
@@ -112,7 +113,7 @@ export default function Today() {
           </View>
           <View style={styles.bannerMarks}>
             {SESSIONS.map((s) => (
-              <SessionMark key={s.id} type={s.id} size={22} color={c.inkSoft} />
+              <SessionMark key={s.id} type={s.id} size={28} color={c.inkSoft} />
             ))}
           </View>
           <View style={styles.bannerText}>
@@ -138,6 +139,7 @@ export default function Today() {
             router.push('/how-to-write');
           }}
           style={[styles.rowCard, { backgroundColor: c.surface, borderColor: c.hairline }]}>
+          <Glyph name="pen" size={34} color={c.inkSoft} />
           <View style={{ flex: 1, gap: 2 }}>
             <T variant="label">{t.today.guideLabel}</T>
             <T variant="medium">{t.today.guideTitle}</T>
@@ -153,7 +155,7 @@ export default function Today() {
             inkColor={c.ink}
             onPress={() => router.navigate('/capture')}
             style={[styles.rowCard, { backgroundColor: c.surface, borderColor: c.hairline }]}>
-            <View style={[styles.waitingDot, { backgroundColor: c.accent }]} />
+            <Glyph name="cloud" size={34} color={c.inkSoft} />
             <T variant="body" style={{ flex: 1 }}>
               {t.today.waiting(waiting)}
             </T>
@@ -176,6 +178,7 @@ export default function Today() {
       </SectionLabel>
       {sessions.length === 0 ? (
         <View style={[styles.empty, { borderColor: c.hairline }]}>
+          <Glyph name="sunrise" size={44} color={c.inkFaint} />
           <T variant="italic" tone="faint" center style={{ fontSize: 17 }}>
             {t.today.empty}
           </T>
@@ -239,9 +242,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.card,
     padding: space.md,
   },
-  waitingDot: { width: 6, height: 6, borderRadius: 3 },
   empty: {
-    height: 120,
+    height: 140,
+    gap: space.sm,
     borderRadius: 22,
     borderWidth: StyleSheet.hairlineWidth,
     borderStyle: 'dashed',
