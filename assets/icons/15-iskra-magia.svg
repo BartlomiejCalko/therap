@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <title>Iskra – magia</title>
+  <path d="M32 8 Q34.47 29.53 56 32 Q34.47 34.47 32 56 Q29.53 34.47 8 32 Q29.53 29.53 32 8 Z"/>
+  <path d="M32 18 Q33.56 30.44 46 32 Q33.56 33.56 32 46 Q30.44 33.56 18 32 Q30.44 30.44 32 18 Z" stroke-width="1"/>
+  <circle cx="32" cy="32" r="1.6" fill="#000" stroke="none"/>
+  <line x1="39.78" y1="24.22" x2="43.31" y2="20.69" stroke-width="1"/>
+  <line x1="39.78" y1="39.78" x2="43.31" y2="43.31" stroke-width="1"/>
+  <line x1="24.22" y1="39.78" x2="20.69" y2="43.31" stroke-width="1"/>
+  <line x1="24.22" y1="24.22" x2="20.69" y2="20.69" stroke-width="1"/>
+</svg>

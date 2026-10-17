@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <title>Piórko – lekkość</title>
+  <path d="M32 7 C42 16 44 31 38 45 L32 50 L26 45 C20 31 22 16 32 7 Z"/>
+  <line x1="32" y1="12" x2="32" y2="58"/>
+  <line x1="32" y1="22" x2="27" y2="18" stroke-width="1"/>
+  <line x1="32" y1="22" x2="37" y2="18" stroke-width="1"/>
+  <line x1="32" y1="28" x2="25" y2="24" stroke-width="1"/>
+  <line x1="32" y1="28" x2="39" y2="24" stroke-width="1"/>
+  <line x1="32" y1="34" x2="24.5" y2="30" stroke-width="1"/>
+  <line x1="32" y1="34" x2="39.5" y2="30" stroke-width="1"/>
+  <line x1="32" y1="40" x2="26" y2="36" stroke-width="1"/>
+  <line x1="32" y1="40" x2="38" y2="36" stroke-width="1"/>
+</svg>
