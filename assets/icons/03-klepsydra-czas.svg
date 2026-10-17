@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <title>Klepsydra – czas</title>
+  <line x1="16" y1="8" x2="48" y2="8"/>
+  <line x1="19" y1="11.5" x2="45" y2="11.5"/>
+  <line x1="16" y1="56" x2="48" y2="56"/>
+  <line x1="19" y1="52.5" x2="45" y2="52.5"/>
+  <path d="M21 11.5 C21 24 30 27 30 32 C30 37 21 40 21 52.5"/>
+  <path d="M43 11.5 C43 24 34 27 34 32 C34 37 43 40 43 52.5"/>
+  <line x1="24.5" y1="19" x2="39.5" y2="19" stroke-width="1"/>
+  <line x1="27" y1="23" x2="37" y2="23" stroke-width="1"/>
+  <line x1="32" y1="35" x2="32" y2="36" stroke-width="1"/>
+  <line x1="32" y1="39" x2="32" y2="40" stroke-width="1"/>
+  <line x1="32" y1="43" x2="32" y2="44" stroke-width="1"/>
+  <line x1="25" y1="49" x2="39" y2="49" stroke-width="1"/>
+  <line x1="28" y1="46" x2="36" y2="46" stroke-width="1"/>
+</svg>

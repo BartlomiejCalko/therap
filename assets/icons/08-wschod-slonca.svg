@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <title>Wschód słońca – nowy początek</title>
+  <line x1="10" y1="46" x2="54" y2="46"/>
+  <line x1="16" y1="50" x2="48" y2="50"/>
+  <line x1="23" y1="54" x2="41" y2="54"/>
+  <path d="M22 46 A10 10 0 0 1 42 46"/>
+  <path d="M26 46 A6 6 0 0 1 38 46" stroke-width="1"/>
+  <line x1="18.96" y1="42.51" x2="10.75" y2="40.31" stroke-width="1.2"/>
+  <line x1="20.31" y1="39.25" x2="15.98" y2="36.75" stroke-width="1.2"/>
+  <line x1="22.45" y1="36.45" x2="16.44" y2="30.44" stroke-width="1.2"/>
+  <line x1="25.25" y1="34.31" x2="22.75" y2="29.98" stroke-width="1.2"/>
+  <line x1="28.51" y1="32.96" x2="26.31" y2="24.75" stroke-width="1.2"/>
+  <line x1="32" y1="32.5" x2="32" y2="27.5" stroke-width="1.2"/>
+  <line x1="35.49" y1="32.96" x2="37.69" y2="24.75" stroke-width="1.2"/>
+  <line x1="38.75" y1="34.31" x2="41.25" y2="29.98" stroke-width="1.2"/>
+  <line x1="41.55" y1="36.45" x2="47.56" y2="30.44" stroke-width="1.2"/>
+  <line x1="43.69" y1="39.25" x2="48.02" y2="36.75" stroke-width="1.2"/>
+  <line x1="45.04" y1="42.51" x2="53.25" y2="40.31" stroke-width="1.2"/>
+</svg>

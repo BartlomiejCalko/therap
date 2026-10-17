@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <title>List do siebie</title>
+  <path d="M9 18 H55 V48 H9 Z"/>
+  <path d="M9 18 L26.8 31.2"/>
+  <path d="M55 18 L37.2 31.2"/>
+  <path d="M9 48 L24 35" stroke-width="1"/>
+  <path d="M55 48 L40 35" stroke-width="1"/>
+  <circle cx="32" cy="35" r="6" stroke-width="1.2"/>
+  <path d="M32 31.4 Q32.49 34.51 35.6 35 Q32.49 35.49 32 38.6 Q31.51 35.49 28.4 35 Q31.51 34.51 32 31.4 Z" fill="#000" stroke="none"/>
+</svg>

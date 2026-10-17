@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <title>Księżyc – wyciszenie</title>
+  <path d="M48.33 40 A20 20 0 1 1 32.89 12.21 A16 16 0 1 0 48.33 40 Z"/>
+  <path d="M43.79 37.89 A15 15 0 1 1 31.93 17.12 A12 12 0 1 0 43.79 37.89 Z" stroke-width="1"/>
+  <path d="M51 8 Q51.71 12.29 56 13 Q51.71 13.71 51 18 Q50.29 13.71 46 13 Q50.29 12.29 51 8 Z" fill="#000" stroke="none"/>
+  <circle cx="56" cy="24" r="1.1" fill="#000" stroke="none"/>
+  <circle cx="45" cy="20" r="0.9" fill="#000" stroke="none"/>
+</svg>

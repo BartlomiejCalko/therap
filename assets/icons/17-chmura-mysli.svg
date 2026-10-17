@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <title>Chmura myśli</title>
+  <path d="M7 44 A6.5 6.5 0 0 1 20 44 A12 12 0 0 1 44 44 A6.5 6.5 0 0 1 57 44 Z"/>
+  <path d="M24 44 A8 8 0 0 1 40 44" stroke-width="1"/>
+  <path d="M28 44 A4 4 0 0 1 36 44" stroke-width="1"/>
+  <path d="M10.5 44 A3 3 0 0 1 16.5 44" stroke-width="1"/>
+  <path d="M47.5 44 A3 3 0 0 1 53.5 44" stroke-width="1"/>
+  <line x1="13" y1="49" x2="51" y2="49" stroke-width="1"/>
+  <line x1="20" y1="53" x2="44" y2="53" stroke-width="1" stroke-dasharray="3 3"/>
+  <path d="M48 11 Q48.71 15.29 53 16 Q48.71 16.71 48 21 Q47.29 16.71 43 16 Q47.29 15.29 48 11 Z" fill="#000" stroke="none"/>
+  <circle cx="55" cy="26" r="1.1" fill="#000" stroke="none"/>
+</svg>
