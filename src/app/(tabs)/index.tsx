@@ -7,6 +7,7 @@ import { Glyph } from '@/components/Glyph';
 import { Icon } from '@/components/Icon';
 import { InkPress } from '@/components/motion';
 import { SessionBanner, StateArt } from '@/components/StateArt';
+import { Sunrise } from '@/components/Sunrise';
 import { T } from '@/components/T';
 import { FadeIn, Screen, SectionLabel } from '@/components/ui';
 import { CHECKIN_STATES } from '@/content/copy';
@@ -113,7 +114,7 @@ export default function Today() {
             {banner.w > 0 && <SessionBanner c={c} width={banner.w} height={banner.h} />}
           </View>
           <View pointerEvents="none" style={styles.bannerSun}>
-            <Glyph name="sunrise" size={112} crop={[8, 22, 48, 34]} weight={0.55} color={c.ink} />
+            <Sunrise size={130} weight={0.55} color={c.ink} />
           </View>
           <T variant="heading" center style={{ fontSize: 26, lineHeight: 32, marginTop: space.md }}>
             {t.today.chooseSession}
