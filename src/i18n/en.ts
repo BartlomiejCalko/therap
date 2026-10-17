@@ -141,20 +141,22 @@ export const en = {
   },
 
   checkin: {
-    label: 'What brings you here now',
     question: 'If it had a name, what would it be?',
-    placeholder: 'one word or a few is enough',
+    hint: 'One word or a few is enough.',
     forward: 'Forward',
   },
 
-  affirmation: "You don't need to solve it now, just give it a place to go.",
+  affirmation: {
+    title: "You don't need to solve it now.",
+    subtitle: 'Just give it a place to go.',
+  },
 
   choose: {
     title: 'Choose your session',
     subtitle: 'Four lengths of quiet',
     unloading: 'Unloading',
     cameWith: 'You came with',
-    howToWrite: 'How to write',
+    howToWrite: 'See how to write',
     a11y: (name: string, minutes: number, line: string) => `${name}, ${minutes} minutes. ${line}`,
   },
 

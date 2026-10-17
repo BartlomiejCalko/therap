@@ -10,6 +10,7 @@ import { useTheme } from '@/theme/theme';
 import { radius, space } from '@/theme/tokens';
 
 import { toneFor } from './Cards';
+import { Icon } from './Icon';
 import { InkPress } from './motion';
 import { SessionMark } from './SessionMark';
 import { T } from './T';
@@ -25,10 +26,10 @@ export function ChooseSession({ ctx }: { ctx: FlowContext }) {
 
   return (
     <View>
-      <T variant="title" center style={{ marginTop: space.md }}>
+      <T variant="display" style={{ marginTop: space.sm }}>
         {t.choose.title}
       </T>
-      <T variant="small" tone="faint" center style={{ marginTop: space.xs }}>
+      <T variant="body" tone="soft" style={{ marginTop: space.xs }}>
         {t.choose.subtitle}
       </T>
 
@@ -50,7 +51,8 @@ export function ChooseSession({ ctx }: { ctx: FlowContext }) {
         </View>
       )}
 
-      <View style={styles.grid}>
+      {/* One wide card per session, stacked, so each reads in a single glance. */}
+      <View style={styles.list}>
         {SESSIONS.map((s) => {
           const copy = t.sessions[s.id];
           return (
@@ -59,25 +61,25 @@ export function ChooseSession({ ctx }: { ctx: FlowContext }) {
               accessibilityRole="button"
               accessibilityLabel={t.choose.a11y(copy.name, s.minutes, copy.line)}
               inkColor={c.ink}
-              containerStyle={styles.tileSlot}
               onPress={() => {
                 tap();
                 beginSession(s.id, ctx, data.settings);
               }}
               style={[styles.tile, { backgroundColor: toneFor(c, s.id) }]}>
               <View style={styles.tileTop}>
-                <SessionMark type={s.id} size={36} />
-                <T variant="label" tone="soft">
+                <SessionMark type={s.id} size={34} color={c.inkSoft} />
+                <T variant="small" tone="soft">
                   {t.common.minutes(s.minutes)}
                 </T>
               </View>
-              <View>
-                <T variant="title" style={{ fontSize: 28 }}>
-                  {copy.name}
-                </T>
-                <T variant="small" tone="soft" style={{ marginTop: 4 }}>
+              <T variant="title" style={{ fontSize: 28, lineHeight: 34, marginTop: space.sm }}>
+                {copy.name}
+              </T>
+              <View style={styles.tileBottom}>
+                <T variant="small" tone="soft" style={{ flex: 1 }}>
                   {copy.line}
                 </T>
+                <Icon name="arrow" size={18} color={c.ink} />
               </View>
             </InkPress>
           );
@@ -104,13 +106,8 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     padding: space.md,
   },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: space.lg },
-  tileSlot: { width: '48.5%', flexGrow: 1 },
-  tile: {
-    aspectRatio: 0.78,
-    borderRadius: radius.card,
-    padding: 16,
-    justifyContent: 'space-between',
-  },
+  list: { gap: 12, marginTop: space.lg },
+  tile: { borderRadius: radius.card, paddingVertical: 18, paddingHorizontal: 22 },
   tileTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  tileBottom: { flexDirection: 'row', alignItems: 'flex-end', gap: space.md, marginTop: 4 },
 });

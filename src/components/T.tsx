@@ -15,7 +15,9 @@ type Variant =
   | 'medium'
   | 'label'
   | 'type'
-  | 'typeSmall';
+  | 'typeSmall'
+  | 'mono'
+  | 'monoSmall';
 
 type Tone = 'ink' | 'soft' | 'faint' | 'accent' | 'onInk';
 
@@ -29,8 +31,12 @@ const variants: Record<Variant, TextStyle> = {
   body: { fontFamily: fonts.sans, fontSize: 15, lineHeight: 22 },
   small: { fontFamily: fonts.sans, fontSize: 13, lineHeight: 18 },
   medium: { fontFamily: fonts.sansMedium, fontSize: 15, lineHeight: 20 },
-  type: { fontFamily: fonts.type, fontSize: 17, lineHeight: 27 },
-  typeSmall: { fontFamily: fonts.type, fontSize: 14, lineHeight: 21 },
+  // The person's own words, outside the writing machine.
+  type: { fontFamily: fonts.serif, fontSize: 18, lineHeight: 27 },
+  typeSmall: { fontFamily: fonts.serif, fontSize: 15, lineHeight: 21 },
+  // The writing machine's own typewriter face.
+  mono: { fontFamily: fonts.typewriter, fontSize: 17, lineHeight: 27 },
+  monoSmall: { fontFamily: fonts.typewriter, fontSize: 14, lineHeight: 21 },
   label: {
     fontFamily: fonts.sansMedium,
     fontSize: 10.5,

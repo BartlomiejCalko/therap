@@ -5,6 +5,7 @@ import {
   Newsreader_300Light_Italic,
   Newsreader_400Regular,
   Newsreader_400Regular_Italic,
+  Newsreader_500Medium,
 } from '@expo-google-fonts/newsreader';
 import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
@@ -35,6 +36,7 @@ export default function RootLayout() {
     Newsreader_300Light_Italic,
     Newsreader_400Regular,
     Newsreader_400Regular_Italic,
+    Newsreader_500Medium,
     Inter_400Regular,
     Inter_500Medium,
     CourierPrime_400Regular,
@@ -84,7 +86,7 @@ function Root({ fontsLoaded }: { fontsLoaded: boolean }) {
         <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.bg } }}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="welcome" options={{ animation: 'fade' }} />
-          <Stack.Screen name="affirmation" options={{ animation: 'fade' }} />
+          <Stack.Screen name="affirmation" options={{ animation: 'none' }} />
           <Stack.Screen name="how-to-write" options={{ presentation: 'modal' }} />
           <Stack.Screen name="session/write" options={{ gestureEnabled: false, animation: 'fade' }} />
           <Stack.Screen name="session/ground" options={{ animation: 'fade' }} />

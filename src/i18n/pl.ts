@@ -160,20 +160,22 @@ export const pl: Dict = {
   },
 
   checkin: {
-    label: 'Co cię tu teraz sprowadza',
     question: 'Gdyby to miało nazwę, jak by brzmiała?',
-    placeholder: 'wystarczy jedno słowo albo kilka',
+    hint: 'Wystarczy jedno albo kilka słów.',
     forward: 'Dalej',
   },
 
-  affirmation: 'Nie musisz tego teraz rozwiązywać. Wystarczy dać temu miejsce.',
+  affirmation: {
+    title: 'Nie musisz tego teraz rozwiązywać.',
+    subtitle: 'Wystarczy dać temu miejsce.',
+  },
 
   choose: {
     title: 'Wybierz sesję',
     subtitle: 'Cztery długości ciszy',
     unloading: 'Zrzucasz z głowy',
     cameWith: 'Przychodzisz z',
-    howToWrite: 'Jak pisać',
+    howToWrite: 'Zobacz, jak pisać',
     a11y: (name, minutes, line) => `${name}, ${minutes} ${pluralPl(minutes, 'minuta', 'minuty', 'minut')}. ${line}`,
   },
 

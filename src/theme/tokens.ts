@@ -61,10 +61,11 @@ export const fonts = {
   serifLightItalic: 'Newsreader_300Light_Italic',
   serif: 'Newsreader_400Regular',
   serifItalic: 'Newsreader_400Regular_Italic',
+  serifMedium: 'Newsreader_500Medium',
   sans: 'Inter_400Regular',
   sansMedium: 'Inter_500Medium',
-  // The person's own words are always set in typewriter type.
-  type: 'CourierPrime_400Regular',
+  // The typewriter face belongs to the writing machine alone.
+  typewriter: 'CourierPrime_400Regular',
 } as const;
 
 export const space = {
@@ -80,6 +81,8 @@ export const space = {
 export const radius = {
   card: 18,
   pill: 999,
+  // Calls to action: a soft rectangle rather than a pill.
+  button: 14,
 } as const;
 
 // Leaves room for the floating pill tab bar.

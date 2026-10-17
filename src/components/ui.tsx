@@ -429,8 +429,8 @@ const styles = StyleSheet.create({
     marginBottom: space.md,
   },
   pill: {
-    height: 50,
-    borderRadius: radius.pill,
+    height: 52,
+    borderRadius: radius.button,
     paddingHorizontal: space.lg,
     flexDirection: 'row',
     alignItems: 'center',

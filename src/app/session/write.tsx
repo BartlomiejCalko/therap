@@ -213,10 +213,10 @@ export default function Write() {
               <Icon name="close" size={18} color={MACHINE.bodyText} />
             </Pressable>
             <View style={{ alignItems: 'center' }}>
-              <T variant="typeSmall" style={{ color: MACHINE.bodyFaint, fontSize: 12 }}>
+              <T variant="monoSmall" style={{ color: MACHINE.bodyFaint, fontSize: 12 }}>
                 {t.sessions[type].name.toLowerCase()}
               </T>
-              <T variant="type" style={{ color: MACHINE.bodyText, fontSize: 15, lineHeight: 20 }}>
+              <T variant="mono" style={{ color: MACHINE.bodyText, fontSize: 15, lineHeight: 20 }}>
                 {timeUp ? t.write.time : formatClock(remaining)}
               </T>
             </View>
@@ -230,7 +230,7 @@ export default function Write() {
                 <Icon name={muted ? 'soundOff' : 'sound'} size={18} color={MACHINE.bodyText} />
               </Pressable>
             ) : (
-              <T variant="typeSmall" style={[styles.counter, { color: MACHINE.bodyFaint }]}>
+              <T variant="monoSmall" style={[styles.counter, { color: MACHINE.bodyFaint }]}>
                 {t.common.words(words)}
               </T>
             )}
@@ -330,7 +330,7 @@ export default function Write() {
                       <CrossfadeText text={bottomPhrase} />
                     </View>
                     <View style={styles.actions}>
-                      <T variant="typeSmall" tone="faint">
+                      <T variant="monoSmall" tone="faint">
                         {sound !== 'none' ? t.common.words(words) : ''}
                       </T>
                       {/* No Finish while the time runs: nothing should invite leaving early.
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
   opening: { marginBottom: space.lg, gap: space.sm },
   openingRow: { flexDirection: 'row', gap: space.md, alignItems: 'flex-start' },
   input: {
-    fontFamily: fonts.type,
+    fontFamily: fonts.typewriter,
     fontSize: FONT_SIZE,
     lineHeight: LINE,
     padding: 0,

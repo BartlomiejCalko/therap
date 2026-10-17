@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     padding: space.md,
   },
   input: {
-    fontFamily: fonts.type,
+    fontFamily: fonts.serif,
     fontSize: 17,
     lineHeight: 26,
     minHeight: 84,

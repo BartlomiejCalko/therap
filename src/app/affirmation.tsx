@@ -1,38 +1,34 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Glyph } from '@/components/Glyph';
 import { T } from '@/components/T';
-import { CircleButton, FadeIn, PillButton, Screen, TopBar } from '@/components/ui';
+import { CircleButton, PillButton, Screen, TopBar } from '@/components/ui';
 import { useT } from '@/i18n';
-import { useTheme } from '@/theme/theme';
-import { space } from '@/theme/tokens';
+import { fonts, space } from '@/theme/tokens';
 
 export default function Affirmation() {
-  const { c } = useTheme();
   const t = useT();
   const { checkinId } = useLocalSearchParams<{ checkinId?: string }>();
 
   return (
     <Screen scroll={false} edges={['top', 'bottom']}>
       <TopBar left={<CircleButton icon="back" label={t.common.back} onPress={() => router.back()} />} />
+      {/* Appears whole and at once: nothing here should slow the person down. */}
       <View style={styles.center}>
-        <FadeIn>
-          <Glyph name="feather" size={56} color={c.inkSoft} />
-        </FadeIn>
-        <FadeIn delay={300}>
-          <T variant="display" center style={{ fontSize: 34, lineHeight: 42 }}>
-            {t.affirmation}
-          </T>
-        </FadeIn>
+        <T variant="display" center style={{ fontFamily: fonts.serifMedium, fontSize: 32, lineHeight: 40 }}>
+          {t.affirmation.title}
+        </T>
+        <T variant="serif" tone="soft" center style={{ marginTop: space.md, fontSize: 20, lineHeight: 28 }}>
+          {t.affirmation.subtitle}
+        </T>
       </View>
-      <FadeIn delay={1400} style={{ paddingBottom: space.md }}>
+      <View style={{ paddingBottom: space.md }}>
         <PillButton
           title={t.choose.title}
           icon="arrow"
           onPress={() => router.push({ pathname: '/choose', params: checkinId ? { checkinId } : {} })}
         />
-      </FadeIn>
+      </View>
     </Screen>
   );
 }
