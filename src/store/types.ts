@@ -32,6 +32,9 @@ export type Session = {
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 
+// The typeface the person writes in: typewriter, serif or sans.
+export type WritingFont = 'mono' | 'serif' | 'sans';
+
 export type SessionOptions = {
   starters: boolean;
   companion: boolean;
@@ -48,6 +51,9 @@ export type Settings = {
   askEachTime: Record<keyof SessionOptions, boolean>;
   defaults: SessionOptions;
   showHowToWrite: boolean;
+  writingFont: WritingFont;
+  // Set once the writing settings have been shown before a first session.
+  writingSetUp: boolean;
   noticeShift: boolean;
   pinEnabled: boolean;
   onboardedAt?: number;
@@ -68,6 +74,8 @@ export const DEFAULT_SETTINGS: Settings = {
   askEachTime: { starters: true, companion: true, sound: true, breath: true },
   defaults: { starters: true, companion: true, sound: 'none', breath: false },
   showHowToWrite: true,
+  writingFont: 'mono',
+  writingSetUp: false,
   noticeShift: true,
   pinEnabled: false,
 };

@@ -239,6 +239,16 @@ export const pl: Dict = {
     keepWriting: 'Pisz dalej',
     leaveWithoutSaving: 'Wyjdź bez zapisywania',
     leaveEmpty: 'Wyjdź',
+    settingsTitle: 'Ustawienia pisania',
+    font: 'Czcionka',
+    fonts: { mono: 'Maszynowa', serif: 'Szeryfowa', sans: 'Bezszeryfowa' },
+    fontA11y: (name: string) => `Czcionka: ${name}. Otwórz ustawienia pisania`,
+    sound: 'Dźwięk w tle',
+    soundHint: 'Dotknij dźwięku, żeby usłyszeć krótką próbkę.',
+    soundPlaying: (name: string) => `Odtwarzam próbkę: ${name}`,
+    companion: 'Teksty wspierające',
+    companionHint: 'Krótkie zdania, które pojawiają się pod szyną podczas pisania.',
+    settingsNote: 'Możesz tu wrócić w każdej chwili podczas pisania: ustawienia są w prawym górnym rogu edytora.',
   },
 
   complete: {

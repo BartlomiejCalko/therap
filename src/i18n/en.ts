@@ -220,6 +220,16 @@ export const en = {
     keepWriting: 'Keep writing',
     leaveWithoutSaving: 'Leave without saving',
     leaveEmpty: 'Leave',
+    settingsTitle: 'Writing settings',
+    font: 'Typeface',
+    fonts: { mono: 'Typewriter', serif: 'Serif', sans: 'Sans serif' },
+    fontA11y: (name: string) => `Typeface: ${name}. Open writing settings`,
+    sound: 'Background sound',
+    soundHint: 'Tap a sound to hear a short sample.',
+    soundPlaying: (name: string) => `Playing a sample: ${name}`,
+    companion: 'Supportive phrases',
+    companionHint: 'Short lines that appear under the rail while you write.',
+    settingsNote: 'You can come back here any time while writing: the settings sit in the top right corner of the editor.',
   },
 
   complete: {
