@@ -19,6 +19,7 @@ import { Dissolve } from '@/components/motion';
 import { T } from '@/components/T';
 import { FadeIn, PillButton, Screen, TextLink } from '@/components/ui';
 import { useT } from '@/i18n';
+import { sessionLength } from '@/lib/sessionLength';
 import { done, soft } from '@/lib/haptics';
 import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
@@ -77,7 +78,6 @@ export default function Complete() {
   const cardPaper = useAnimatedStyle(() => ({ opacity: paper.value }));
 
   if (!session) return null;
-  const minutes = Math.max(1, Math.round((session.endedAt - session.startedAt) / 60000));
   const goHome = () => router.dismissTo('/');
 
   return (
@@ -86,7 +86,7 @@ export default function Complete() {
         <Enso size={128} />
         <FadeIn delay={1600} style={{ alignItems: 'center' }}>
           <T variant="label" style={{ marginTop: space.lg }}>
-            {t.sessions[session.type].name} · {t.common.minutes(minutes)} · {t.common.words(session.wordCount)}
+            {t.sessions[session.type].name} · {sessionLength(session, t)} · {t.common.words(session.wordCount)}
           </T>
           <T variant="display" center style={{ marginTop: space.sm }}>
             {t.complete.title}

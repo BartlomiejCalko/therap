@@ -21,6 +21,8 @@ export type Session = {
   startedAt: number;
   endedAt: number;
   plannedMinutes: number;
+  // Writing past the planned time, in seconds, when the person chose to keep going.
+  extendedSeconds?: number;
   text: string;
   wordCount: number;
   // Letting go erases the words; the session itself stays in the calendar.

@@ -8,6 +8,7 @@ import { T } from '@/components/T';
 import { CircleButton, Hairline, PillButton, Screen, Sheet, TopBar } from '@/components/ui';
 import { SHIFT_AREAS } from '@/content/copy';
 import { useT } from '@/i18n';
+import { sessionLength } from '@/lib/sessionLength';
 import { timeOfDay } from '@/lib/date';
 import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
@@ -35,7 +36,6 @@ export default function Entry() {
 
   const checkin = data.checkins.find((x) => x.id === session.checkinId);
   const capture = data.captures.find((x) => x.id === session.captureId);
-  const minutes = Math.max(1, Math.round((session.endedAt - session.startedAt) / 60000));
   const shifts = SHIFT_AREAS.filter((a) => session.shift?.[a]);
 
   return (
@@ -48,7 +48,7 @@ export default function Entry() {
       <View style={{ alignItems: 'center', gap: space.sm, marginTop: space.md }}>
         <SessionMark type={session.type} size={40} />
         <T variant="label">
-          {t.sessions[session.type].name} · {t.common.minutes(minutes)} · {t.common.words(session.wordCount)}
+          {t.sessions[session.type].name} · {sessionLength(session, t)} · {t.common.words(session.wordCount)}
         </T>
         <T variant="title" center>
           {t.dates.long(new Date(session.startedAt))}

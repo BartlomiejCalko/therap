@@ -25,6 +25,7 @@ import { PillButton, Sheet } from '@/components/ui';
 import { isSessionType, sessionMinutes, SOUNDS, type SessionType, type SoundId } from '@/content/copy';
 import { useT } from '@/i18n';
 import { formatClock, wordCount } from '@/lib/date';
+import { followEdit, splitRuns, startFont, type FontRun } from '@/lib/fontRuns';
 import { done, tap } from '@/lib/haptics';
 import { useFocusSound } from '@/lib/useFocusSound';
 import { useStore } from '@/store/store';
@@ -49,6 +50,8 @@ const pickIndex = (length: number, not?: number | null) => {
 
 const LINE = 32;
 const HEADER_HEIGHT = 60;
+// The extra time, past the session's length.
+const OVERTIME = { light: '#4F8A4B', dark: '#8DBB87' };
 // The paper fills the screen; this is where a line of text starts from its edge.
 const COLUMN_INSET = 20;
 
@@ -107,6 +110,11 @@ export default function Write() {
   const inputRef = useRef<TextInput>(null);
 
   const [text, setText] = useState('');
+  // Which face each part of the text was written in; a face change applies from the caret on.
+  const [runs, setRuns] = useState<FontRun[]>(() => [{ at: 0, font: data.settings.writingFont }]);
+  const caret = useRef(0);
+  // Chosen when the time is up: keep writing, and the extra time is counted and saved.
+  const [extended, setExtended] = useState(false);
   const [started, setStarted] = useState(false);
   // The prompt stays on the page while its words drift away, then makes room.
   const [promptGone, setPromptGone] = useState(false);
@@ -141,17 +149,19 @@ export default function Write() {
 
   const planned = minutes * 60;
   const elapsed = (now - startedAt) / 1000;
-  const remaining = planned - elapsed;
-  const timeUp = remaining <= 0;
+  const timeUp = elapsed >= planned;
+  const overtime = Math.max(0, elapsed - planned);
+  // Time is up and the person has not chosen to keep going: the page is closed.
+  const closed = timeUp && !extended;
   // The machine: rail, capsule and carriage belong to the typewriter face only.
   const machine = prefs.font === 'mono';
 
-  // When the time is up the page closes: no more typing, only finishing.
+  // When the time is up the page closes: no more typing, only finishing or keeping going.
   useEffect(() => {
-    if (!timeUp) return;
+    if (!closed) return;
     Keyboard.dismiss();
     setPopover(null);
-  }, [timeUp]);
+  }, [closed]);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -163,7 +173,7 @@ export default function Write() {
       notified.current = true;
       done();
     }
-    if (!companion || timeUp || !started) return;
+    if (!companion || closed || !started) return;
     const paused = now - typedAt.current > PAUSE_MS;
     // One phrase per pause, otherwise a slow rotation while the writing flows.
     if ((paused && !answeredPause.current) || now - phraseAt.current > PHRASE_EVERY_MS) {
@@ -171,7 +181,7 @@ export default function Write() {
       phraseAt.current = now;
       setPhrase((p) => pickIndex(t.companion.length, p));
     }
-  }, [now, timeUp, companion, started, t.companion.length]);
+  }, [now, timeUp, closed, companion, started, t.companion.length]);
 
   const onChange = (value: string) => {
     // A soft tick at the end of each word, like a typewriter carriage — never more than one per 70 ms.
@@ -181,6 +191,8 @@ export default function Write() {
       tap();
     }
     if (value.length > text.length) setStrike((n) => n + 1);
+    // An emptied page starts over in the face that is chosen now.
+    setRuns((r) => (value === '' ? [{ at: 0, font: prefs.font }] : followEdit(r, text, value)));
     setText(value);
     typedAt.current = Date.now();
     answeredPause.current = false;
@@ -198,6 +210,7 @@ export default function Write() {
       startedAt,
       endedAt: Date.now(),
       plannedMinutes: minutes,
+      extendedSeconds: extended ? Math.round(overtime) : undefined,
       text: trimmed,
       wordCount: wordCount(trimmed),
       checkinId: params.checkinId,
@@ -230,6 +243,10 @@ export default function Write() {
   const changePrefs = (patch: Partial<WritingPrefs>) => {
     const next = { ...prefs, ...patch };
     setPrefs(next);
+    // A new face starts where the caret is; what is already written keeps its own.
+    if (patch.font && patch.font !== prefs.font) {
+      setRuns((r) => startFont(r, Math.min(caret.current, text.length), patch.font!, text.length));
+    }
     updateSettings({
       writingFont: next.font,
       defaults: { ...data.settings.defaults, sound: next.sound, companion: next.companion },
@@ -242,7 +259,7 @@ export default function Write() {
   };
   const closePopover = () => {
     setPopover(null);
-    if (!timeUp) setTimeout(() => inputRef.current?.focus(), 250);
+    if (!closed) setTimeout(() => inputRef.current?.focus(), 250);
   };
   const toggleCompanion = () => {
     tap();
@@ -264,6 +281,17 @@ export default function Write() {
     setTimeout(() => inputRef.current?.focus(), 350);
   };
   const inputFace = { fontFamily: face.family, fontSize: face.size };
+  // The text drawn piece by piece, each piece in the face it was written in.
+  const pieces = splitRuns(text, runs).map((piece, i) => (
+    <Text key={i} style={{ fontFamily: WRITING_FONTS[piece.font].family, fontSize: WRITING_FONTS[piece.font].size }}>
+      {piece.text}
+    </Text>
+  ));
+  const keepWriting = () => {
+    tap();
+    setExtended(true);
+    setTimeout(() => inputRef.current?.focus(), 300);
+  };
 
   const railY = Math.max(150, Math.min(paper.h * 0.58, paper.h - FOOT - 40));
 
@@ -292,12 +320,12 @@ export default function Write() {
             </View>
 
             {/* In the middle, the three things worth changing mid-session: face, sound, phrases. */}
-            <View style={[styles.tools, timeUp && { opacity: 0.3 }]} onLayout={(e) => setToolsX(e.nativeEvent.layout.x)}>
+            <View style={[styles.tools, closed && { opacity: 0.3 }]} onLayout={(e) => setToolsX(e.nativeEvent.layout.x)}>
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={t.write.fontA11y(t.write.fonts[prefs.font])}
                 hitSlop={6}
-                disabled={timeUp}
+                disabled={closed}
                 onPress={() => openPopover('font')}
                 onLayout={anchorAt('font')}
                 style={({ pressed }) => [styles.button, { opacity: pressed ? 0.5 : 1 }]}>
@@ -307,7 +335,7 @@ export default function Write() {
                 accessibilityRole="button"
                 accessibilityLabel={t.write.soundA11y(t.sounds[sound])}
                 hitSlop={6}
-                disabled={timeUp}
+                disabled={closed}
                 onPress={() => openPopover('sound')}
                 onLayout={anchorAt('sound')}
                 style={({ pressed }) => [styles.button, { opacity: pressed ? 0.5 : 1 }]}>
@@ -318,7 +346,7 @@ export default function Write() {
                 accessibilityLabel={t.write.companion}
                 accessibilityState={{ checked: companion }}
                 hitSlop={6}
-                disabled={timeUp}
+                disabled={closed}
                 onPress={toggleCompanion}
                 onLayout={anchorAt('companion')}
                 style={({ pressed }) => [styles.button, { opacity: pressed ? 0.5 : 1 }]}>
@@ -327,9 +355,15 @@ export default function Write() {
             </View>
 
             <View style={[styles.side, { alignItems: 'flex-end' }]}>
-              <T variant="small" tone={timeUp ? 'ink' : 'soft'} style={styles.clock}>
-                {timeUp ? '0:00' : formatClock(remaining)}
+              {/* Time counts up to the session's length; past it, the extra time shows in green. */}
+              <T variant="small" style={[styles.clock, { color: c.ink }]}>
+                {formatClock(Math.min(elapsed, planned))}
               </T>
+              {timeUp && overtime >= 1 && (
+                <T variant="small" style={[styles.overtime, { color: dark ? OVERTIME.dark : OVERTIME.light }]}>
+                  +{formatClock(overtime)}
+                </T>
+              )}
             </View>
           </View>
 
@@ -382,7 +416,8 @@ export default function Write() {
                           const padded = text === '' || text.endsWith('\n');
                           setLaidOutLine((padded ? last.slice(0, -1) : last).replace(/\n$/, ''));
                         }}>
-                        {text.endsWith('\n') || text === '' ? `${text} ` : text}
+                        {pieces}
+                        {text.endsWith('\n') || text === '' ? ' ' : null}
                       </Text>
                       {/* Sized to their content (no right edge), so their widths can be read. */}
                       <Text
@@ -402,11 +437,16 @@ export default function Write() {
                     </View>
                     <TextInput
                       ref={inputRef}
-                      value={text}
+                      // Native fields draw nested Text, so each piece keeps its own face; the web
+                      // field is a plain textarea and shows the text in the current face.
+                      {...(Platform.OS === 'web' ? { value: text } : { children: pieces })}
                       onChangeText={onChange}
+                      onSelectionChange={(e) => {
+                        caret.current = e.nativeEvent.selection.end;
+                      }}
                       multiline
                       autoFocus={!settingsOpen}
-                      editable={!timeUp}
+                      editable={!closed}
                       scrollEnabled={false}
                       textAlignVertical="top"
                       placeholder={t.write.placeholder}
@@ -449,14 +489,27 @@ export default function Write() {
                   </View>
                 )}
 
-                {!timeUp && (
-                  <View pointerEvents="none" style={styles.foot}>
-                    <View style={styles.phraseSlot}>{companion && <CrossfadeText text={bottomPhrase} />}</View>
+                {!closed && (
+                  <View pointerEvents="box-none" style={styles.foot}>
+                    <View pointerEvents="none" style={styles.phraseSlot}>
+                      {companion && <CrossfadeText text={bottomPhrase} />}
+                    </View>
+                    {/* Writing on past the time: finishing is one quiet tap away. */}
+                    {extended && (
+                      <Animated.View entering={FadeIn.duration(300)} style={{ alignItems: 'flex-end' }}>
+                        <PillButton
+                          title={t.write.finishSession}
+                          kind="secondary"
+                          onPress={finish}
+                          style={{ height: 42 }}
+                        />
+                      </Animated.View>
+                    )}
                   </View>
                 )}
 
-                {/* Time is up: the page closes and says so plainly, with one way on. */}
-                {timeUp && (
+                {/* Time is up: the page closes and says so plainly. Finish, or keep going. */}
+                {closed && (
                   <Animated.View
                     entering={FadeInDown.duration(420)}
                     style={[styles.endCard, { backgroundColor: c.surface, borderColor: c.hairline, shadowColor: c.shadow }]}>
@@ -471,6 +524,12 @@ export default function Write() {
                       icon="arrow"
                       onPress={finish}
                       style={{ marginTop: space.lg, alignSelf: 'stretch' }}
+                    />
+                    <PillButton
+                      title={t.write.keepWriting}
+                      kind="ghost"
+                      onPress={keepWriting}
+                      style={{ marginTop: 4, alignSelf: 'stretch' }}
                     />
                   </Animated.View>
                 )}
@@ -557,7 +616,9 @@ const styles = StyleSheet.create({
   },
   // Equal sides keep the three controls truly centred.
   side: { width: 64 },
-  clock: { fontVariant: ['tabular-nums'], fontSize: 15 },
+  // A touch smaller and softer than ink, so the time is there without asking to be watched.
+  clock: { fontVariant: ['tabular-nums'], fontSize: 13, lineHeight: 17, opacity: 0.78 },
+  overtime: { fontVariant: ['tabular-nums'], fontSize: 12, lineHeight: 15 },
   tools: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   page: { flex: 1, overflow: 'hidden' },
   column: { position: 'absolute', left: COLUMN_INSET, right: COLUMN_INSET },
