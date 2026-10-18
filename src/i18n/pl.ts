@@ -245,10 +245,16 @@ export const pl: Dict = {
     fontA11y: (name: string) => `Czcionka: ${name}. Zmień czcionkę`,
     sound: 'Dźwięk w tle',
     soundHint: 'Dotknij dźwięku, żeby usłyszeć krótką próbkę.',
+    soundA11y: (name: string) => `Dźwięk: ${name}. Zmień dźwięk`,
+    companionOn: 'Teksty wspierające włączone',
+    companionOff: 'Teksty wspierające wyłączone',
+    timeUpTitle: 'Czas minął',
+    timeUpBody: 'Twoja sesja dobiegła końca. Możesz ją teraz zakończyć.',
+    finishSession: 'Zakończ sesję',
     soundPlaying: (name: string) => `Odtwarzam próbkę: ${name}`,
     companion: 'Teksty wspierające',
     companionHint: 'Krótkie zdania, które pojawiają się pod szyną podczas pisania.',
-    settingsNote: 'Możesz tu wrócić w każdej chwili podczas pisania: ustawienia są w prawym górnym rogu edytora.',
+    settingsNote: 'Możesz to zmienić w każdej chwili podczas pisania, ikonami u góry edytora.',
   },
 
   complete: {

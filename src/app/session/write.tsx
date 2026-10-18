@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import Animated, {
+  FadeIn,
+  FadeInDown,
   FadeOut,
   useAnimatedStyle,
   useReducedMotion,
@@ -10,17 +12,17 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import Svg, { Defs, Line, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
 import { CrossfadeText } from '@/components/CrossfadeText';
 import { Icon } from '@/components/Icon';
-import { MACHINE, Rail, useCarriage } from '@/components/Machine';
+import { MACHINE, RAIL_SPACE, Rail, useCarriage } from '@/components/Machine';
 import { PaperTexture } from '@/components/PaperTexture';
 import { Dissolve } from '@/components/motion';
 import { T } from '@/components/T';
-import { FontPopover, WRITING_FONTS, WritingSettings, type WritingPrefs } from '@/components/WritingSettings';
+import { ChoicePopover, useFontOptions, WRITING_FONTS, WritingSettings, type WritingPrefs } from '@/components/WritingSettings';
 import { PillButton, Sheet } from '@/components/ui';
-import { isSessionType, sessionMinutes, type SessionType, type SoundId } from '@/content/copy';
+import { isSessionType, sessionMinutes, SOUNDS, type SessionType, type SoundId } from '@/content/copy';
 import { useT } from '@/i18n';
 import { formatClock, wordCount } from '@/lib/date';
 import { done, tap } from '@/lib/haptics';
@@ -94,10 +96,14 @@ export default function Write() {
   const face = WRITING_FONTS[prefs.font];
   // Before the very first session the settings open on their own.
   const [settingsOpen, setSettingsOpen] = useState(() => !data.settings.writingSetUp);
-  const [fontOpen, setFontOpen] = useState(false);
-  // Where the "Aa" button sits in the header, so the font bubble can hang right under it.
+  // Which header bubble is open, and where its icon sits, so the bubble can hang right under it.
+  const [popover, setPopover] = useState<'font' | 'sound' | null>(null);
   const [toolsX, setToolsX] = useState(0);
-  const [fontButtonX, setFontButtonX] = useState(0);
+  const [anchors, setAnchors] = useState({ font: 0, sound: 0, companion: 0 });
+  // A short note under the phrases toggle, saying what the tap just did.
+  const [companionNote, setCompanionNote] = useState<string | null>(null);
+  const noteTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const fontOptions = useFontOptions();
   const inputRef = useRef<TextInput>(null);
 
   const [text, setText] = useState('');
@@ -108,7 +114,6 @@ export default function Write() {
   const [starter, setStarter] = useState(() => pickIndex(t.starters.length));
   const [startedAt] = useState(() => Date.now());
   const [now, setNow] = useState(() => Date.now());
-  const [muted, setMuted] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [phrase, setPhrase] = useState<number | null>(null);
   const phraseAt = useRef(Date.now());
@@ -131,13 +136,22 @@ export default function Write() {
   const paperColor = MACHINE.paper[scheme];
   const dark = scheme === 'dark';
 
-  // Quiet while the settings are open, so a sample there is heard on its own.
-  useFocusSound(sound, muted || settingsOpen);
+  // Quiet while the first-time settings are open, so a sample there is heard on its own.
+  useFocusSound(sound, settingsOpen);
 
   const planned = minutes * 60;
   const elapsed = (now - startedAt) / 1000;
   const remaining = planned - elapsed;
   const timeUp = remaining <= 0;
+  // The machine: rail, capsule and carriage belong to the typewriter face only.
+  const machine = prefs.font === 'mono';
+
+  // When the time is up the page closes: no more typing, only finishing.
+  useEffect(() => {
+    if (!timeUp) return;
+    Keyboard.dismiss();
+    setPopover(null);
+  }, [timeUp]);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -216,16 +230,32 @@ export default function Write() {
   const changePrefs = (patch: Partial<WritingPrefs>) => {
     const next = { ...prefs, ...patch };
     setPrefs(next);
-    if (patch.sound && patch.sound !== 'none') setMuted(false);
     updateSettings({
       writingFont: next.font,
       defaults: { ...data.settings.defaults, sound: next.sound, companion: next.companion },
     });
   };
-  const openSettings = () => {
+  const openPopover = (which: 'font' | 'sound') => {
     tap();
     Keyboard.dismiss();
-    setSettingsOpen(true);
+    setPopover((open) => (open === which ? null : which));
+  };
+  const closePopover = () => {
+    setPopover(null);
+    if (!timeUp) setTimeout(() => inputRef.current?.focus(), 250);
+  };
+  const toggleCompanion = () => {
+    tap();
+    const on = !companion;
+    changePrefs({ companion: on });
+    setCompanionNote(on ? t.write.companionOn : t.write.companionOff);
+    clearTimeout(noteTimer.current);
+    noteTimer.current = setTimeout(() => setCompanionNote(null), 1600);
+  };
+  const soundOptions = SOUNDS.map((id) => ({ value: id, label: t.sounds[id] }));
+  const anchorAt = (key: keyof typeof anchors) => (e: { nativeEvent: { layout: { x: number; width: number } } }) => {
+    const x = e.nativeEvent.layout.x + e.nativeEvent.layout.width / 2;
+    setAnchors((a) => (a[key] === x ? a : { ...a, [key]: x }));
   };
   const closeSettings = () => {
     setSettingsOpen(false);
@@ -238,7 +268,7 @@ export default function Write() {
   const railY = Math.max(150, Math.min(paper.h * 0.58, paper.h - FOOT - 40));
 
   const opening = capture ? capture.text : showStarter ? t.starters[starter] : null;
-  const bottomPhrase = timeUp ? t.write.timeUp : phrase === null ? null : t.companion[phrase];
+  const bottomPhrase = phrase === null ? null : t.companion[phrase];
 
   const iconColor = c.inkSoft;
 
@@ -250,60 +280,56 @@ export default function Write() {
       <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1 }}>
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <View style={styles.header}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t.write.leave}
-              hitSlop={10}
-              onPress={() => setLeaving(true)}
-              style={({ pressed }) => [styles.button, { backgroundColor: c.veil, opacity: pressed ? 0.5 : 1 }]}>
-              <Icon name="close" size={18} color={iconColor} />
-            </Pressable>
-
-            {/* Session name and the time left, centred over the page. */}
-            <View pointerEvents="none" style={styles.title}>
-              <T variant="serif" style={{ fontSize: 17, lineHeight: 22 }}>
-                {t.sessions[type].name}
-              </T>
-              <T variant="small" tone="faint" style={styles.clock}>
-                {timeUp ? t.write.time : formatClock(remaining)}
-              </T>
+            <View style={styles.side}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t.write.leave}
+                hitSlop={10}
+                onPress={() => setLeaving(true)}
+                style={({ pressed }) => [styles.button, { backgroundColor: c.veil, opacity: pressed ? 0.5 : 1 }]}>
+                <Icon name="close" size={18} color={iconColor} />
+              </Pressable>
             </View>
 
-            <View style={styles.tools} onLayout={(e) => setToolsX(e.nativeEvent.layout.x)}>
+            {/* In the middle, the three things worth changing mid-session: face, sound, phrases. */}
+            <View style={[styles.tools, timeUp && { opacity: 0.3 }]} onLayout={(e) => setToolsX(e.nativeEvent.layout.x)}>
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={t.write.fontA11y(t.write.fonts[prefs.font])}
                 hitSlop={6}
-                onPress={() => {
-                  tap();
-                  Keyboard.dismiss();
-                  setFontOpen((open) => !open);
-                }}
-                onLayout={(e) => setFontButtonX(e.nativeEvent.layout.x + e.nativeEvent.layout.width / 2)}
+                disabled={timeUp}
+                onPress={() => openPopover('font')}
+                onLayout={anchorAt('font')}
                 style={({ pressed }) => [styles.button, { opacity: pressed ? 0.5 : 1 }]}>
                 <Text style={{ fontFamily: face.family, fontSize: 17, color: iconColor }}>Aa</Text>
               </Pressable>
-              {sound !== 'none' && (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={muted ? t.write.unmute : t.write.mute}
-                  hitSlop={6}
-                  onPress={() => {
-                    tap();
-                    setMuted((m) => !m);
-                  }}
-                  style={({ pressed }) => [styles.button, { opacity: pressed ? 0.5 : 1 }]}>
-                  <Icon name={muted ? 'soundOff' : 'sound'} size={19} color={iconColor} />
-                </Pressable>
-              )}
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={t.write.settingsTitle}
+                accessibilityLabel={t.write.soundA11y(t.sounds[sound])}
                 hitSlop={6}
-                onPress={openSettings}
+                disabled={timeUp}
+                onPress={() => openPopover('sound')}
+                onLayout={anchorAt('sound')}
                 style={({ pressed }) => [styles.button, { opacity: pressed ? 0.5 : 1 }]}>
-                <Icon name="settings" size={19} color={iconColor} />
+                <Icon name={sound === 'none' ? 'soundOff' : 'sound'} size={19} color={iconColor} />
               </Pressable>
+              <Pressable
+                accessibilityRole="switch"
+                accessibilityLabel={t.write.companion}
+                accessibilityState={{ checked: companion }}
+                hitSlop={6}
+                disabled={timeUp}
+                onPress={toggleCompanion}
+                onLayout={anchorAt('companion')}
+                style={({ pressed }) => [styles.button, { opacity: pressed ? 0.5 : 1 }]}>
+                <PhrasesIcon on={companion} color={iconColor} />
+              </Pressable>
+            </View>
+
+            <View style={[styles.side, { alignItems: 'flex-end' }]}>
+              <T variant="small" tone={timeUp ? 'ink' : 'soft'} style={styles.clock}>
+                {timeUp ? '0:00' : formatClock(remaining)}
+              </T>
             </View>
           </View>
 
@@ -380,6 +406,7 @@ export default function Write() {
                       onChangeText={onChange}
                       multiline
                       autoFocus={!settingsOpen}
+                      editable={!timeUp}
                       scrollEnabled={false}
                       textAlignVertical="top"
                       placeholder={t.write.placeholder}
@@ -403,40 +430,86 @@ export default function Write() {
                   </Svg>
                 </View>
 
-                <View pointerEvents="none" style={[styles.railRow, { top: railY }]}>
-                  <Rail progress={Math.min(1, elapsed / planned)} timeUp={timeUp} strike={strike} slide={slide} />
-                </View>
-
-                <View style={styles.foot}>
-                  <View style={styles.phraseSlot}>{companion && <CrossfadeText text={bottomPhrase} />}</View>
-                  {!companion && timeUp && (
-                    <T variant="italic" tone="soft" center style={{ marginBottom: space.sm }}>
-                      {t.write.timeUp}
-                    </T>
-                  )}
-                  {/* No Finish while the time runs: nothing should invite leaving early.
-                      Ending before time stays possible through the close button. */}
-                  {timeUp && (
-                    <View style={{ alignItems: 'flex-end' }}>
-                      <PillButton title={t.write.finish} onPress={finish} disabled={!text.trim()} style={{ height: 44 }} />
+                {machine ? (
+                  <View pointerEvents="none" style={[styles.railRow, { top: railY }]}>
+                    <Rail progress={Math.min(1, elapsed / planned)} timeUp={timeUp} strike={strike} slide={slide} />
+                  </View>
+                ) : (
+                  // Without the machine the page keeps one quiet guide: a hairline under the
+                  // writing line that slowly fills as the session's time passes.
+                  <View pointerEvents="none" style={[styles.guideRow, { top: railY + RAIL_SPACE / 2 }]}>
+                    <View style={[styles.guideTrack, { backgroundColor: c.hairline }]}>
+                      <View
+                        style={[
+                          styles.guideFill,
+                          { width: `${Math.min(1, elapsed / planned) * 100}%`, backgroundColor: c.inkFaint },
+                        ]}
+                      />
                     </View>
-                  )}
-                </View>
+                  </View>
+                )}
+
+                {!timeUp && (
+                  <View pointerEvents="none" style={styles.foot}>
+                    <View style={styles.phraseSlot}>{companion && <CrossfadeText text={bottomPhrase} />}</View>
+                  </View>
+                )}
+
+                {/* Time is up: the page closes and says so plainly, with one way on. */}
+                {timeUp && (
+                  <Animated.View
+                    entering={FadeInDown.duration(420)}
+                    style={[styles.endCard, { backgroundColor: c.surface, borderColor: c.hairline, shadowColor: c.shadow }]}>
+                    <T variant="title" center>
+                      {t.write.timeUpTitle}
+                    </T>
+                    <T variant="body" tone="soft" center style={{ marginTop: space.xs }}>
+                      {t.write.timeUpBody}
+                    </T>
+                    <PillButton
+                      title={text.trim() ? t.write.finishSession : t.write.leaveEmpty}
+                      icon="arrow"
+                      onPress={finish}
+                      style={{ marginTop: space.lg, alignSelf: 'stretch' }}
+                    />
+                  </Animated.View>
+                )}
               </>
             )}
           </View>
 
-          <FontPopover
-            visible={fontOpen}
-            font={prefs.font}
-            anchorX={toolsX + fontButtonX}
+          <ChoicePopover
+            visible={popover === 'font'}
+            options={fontOptions}
+            value={prefs.font}
+            anchorX={toolsX + anchors.font}
             top={HEADER_HEIGHT - 2}
             onPick={(font) => changePrefs({ font })}
-            onClose={() => {
-              setFontOpen(false);
-              setTimeout(() => inputRef.current?.focus(), 250);
-            }}
+            onClose={closePopover}
           />
+          <ChoicePopover
+            visible={popover === 'sound'}
+            options={soundOptions}
+            value={sound}
+            anchorX={toolsX + anchors.sound}
+            top={HEADER_HEIGHT - 2}
+            onPick={(id: SoundId) => changePrefs({ sound: id })}
+            onClose={closePopover}
+          />
+          {companionNote && (
+            <Animated.View
+              pointerEvents="none"
+              entering={FadeIn.duration(160)}
+              exiting={FadeOut.duration(200)}
+              style={[
+                styles.note,
+                { top: HEADER_HEIGHT - 2, left: toolsX + anchors.companion - 110, backgroundColor: c.ink },
+              ]}>
+              <T variant="small" center style={{ color: c.onInk }}>
+                {companionNote}
+              </T>
+            </Animated.View>
+          )}
         </KeyboardAvoidingView>
       </SafeAreaView>
 
@@ -482,9 +555,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
-  clock: { fontVariant: ['tabular-nums'], marginTop: 1 },
-  tools: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  // Equal sides keep the three controls truly centred.
+  side: { width: 64 },
+  clock: { fontVariant: ['tabular-nums'], fontSize: 15 },
+  tools: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   page: { flex: 1, overflow: 'hidden' },
   column: { position: 'absolute', left: COLUMN_INSET, right: COLUMN_INSET },
   mirrorBox: { position: 'absolute', left: 0, right: 0, top: 0, opacity: 0 },
@@ -499,6 +573,38 @@ const styles = StyleSheet.create({
   },
   topFade: { position: 'absolute', top: 0, left: 0 },
   railRow: { position: 'absolute', left: 0, right: 0 },
+  guideRow: { position: 'absolute', left: COLUMN_INSET, right: COLUMN_INSET },
+  guideTrack: { height: 1, borderRadius: 1, overflow: 'hidden' },
+  guideFill: { height: 1 },
+  endCard: {
+    position: 'absolute',
+    left: space.md,
+    right: space.md,
+    bottom: space.lg,
+    borderRadius: 22,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: space.lg,
+    paddingTop: space.lg,
+    paddingBottom: space.md,
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
+  },
+  note: { position: 'absolute', width: 220, borderRadius: 12, paddingVertical: 8, paddingHorizontal: 12 },
   foot: { position: 'absolute', left: COLUMN_INSET, right: COLUMN_INSET, bottom: 18 },
   phraseSlot: { minHeight: 26, justifyContent: 'center', marginBottom: 8 },
 });
+
+// Supportive phrases: a small speech bubble with two lines of text, crossed out when off.
+function PhrasesIcon({ on, color }: { on: boolean; color: string }) {
+  const p = { stroke: color, strokeWidth: 1.4, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' } as const;
+  return (
+    <Svg width={21} height={21} viewBox="0 0 24 24">
+      <Path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-8l-4 3.2v-3.2H5A1.5 1.5 0 0 1 3.5 15V7A1.5 1.5 0 0 1 5 5.5z" {...p} />
+      <Line x1={7.5} y1={9.5} x2={16.5} y2={9.5} {...p} />
+      <Line x1={7.5} y1={12.5} x2={13} y2={12.5} {...p} />
+      {!on && <Line x1={4} y1={4} x2={20.5} y2={20.5} {...p} />}
+    </Svg>
+  );
+}

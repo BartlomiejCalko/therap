@@ -226,10 +226,16 @@ export const en = {
     fontA11y: (name: string) => `Typeface: ${name}. Change typeface`,
     sound: 'Background sound',
     soundHint: 'Tap a sound to hear a short sample.',
+    soundA11y: (name: string) => `Sound: ${name}. Change sound`,
+    companionOn: 'Supportive phrases on',
+    companionOff: 'Supportive phrases off',
+    timeUpTitle: 'Time is up',
+    timeUpBody: 'Your session has come to an end. You can finish it now.',
+    finishSession: 'Finish session',
     soundPlaying: (name: string) => `Playing a sample: ${name}`,
     companion: 'Supportive phrases',
     companionHint: 'Short lines that appear under the rail while you write.',
-    settingsNote: 'You can come back here any time while writing: the settings sit in the top right corner of the editor.',
+    settingsNote: 'You can change all of this any time while writing, with the icons at the top of the editor.',
   },
 
   complete: {

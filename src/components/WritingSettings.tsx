@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, { FadeIn, FadeOut, ZoomIn } from 'react-native-reanimated';
 
@@ -21,6 +21,9 @@ export const WRITING_FONTS: Record<WritingFont, { family: string; size: number }
   sans: { family: fonts.sans, size: 18 },
 };
 const FONT_ORDER: WritingFont[] = ['serif', 'sans', 'mono'];
+
+const POPOVER_W = 212;
+const ARROW = 12;
 
 export type WritingPrefs = { font: WritingFont; sound: SoundId; companion: boolean };
 
@@ -63,25 +66,24 @@ function FontTiles({ value, onPick }: { value: WritingFont; onPick: (font: Writi
   );
 }
 
-const POPOVER_W = 212;
-const ARROW = 12;
-
-// Just the typeface, from the editor's "Aa": a small bubble hanging under the icon.
-// A tap picks a face and closes it; a tap anywhere else just closes it.
-export function FontPopover({
+// A small bubble of choices hanging under one of the editor's header icons, its pointer aimed
+// at the icon. A tap picks an option and closes it; a tap anywhere else just closes it.
+export function ChoicePopover<V extends string>({
   visible,
-  font,
+  options,
+  value,
   anchorX,
   top,
   onPick,
   onClose,
 }: {
   visible: boolean;
-  font: WritingFont;
-  // Centre of the "Aa" button and the bubble's top edge, in the parent's coordinates.
+  options: { value: V; label: string; leading?: ReactNode }[];
+  value: V;
+  // Centre of the icon and the bubble's top edge, in the parent's coordinates.
   anchorX: number;
   top: number;
-  onPick: (font: WritingFont) => void;
+  onPick: (value: V) => void;
   onClose: () => void;
 }) {
   const { c } = useTheme();
@@ -98,27 +100,19 @@ export function FontPopover({
       <Animated.View
         entering={ZoomIn.duration(170).withInitialValues({ transform: [{ scale: 0.92 }] })}
         exiting={FadeOut.duration(120)}
-        style={[
-          styles.popover,
-          { left, top, backgroundColor: c.surface, borderColor: c.hairline, shadowColor: c.shadow },
-        ]}>
-        <View
-          style={[
-            styles.arrow,
-            { left: arrowLeft, backgroundColor: c.surface, borderColor: c.hairline },
-          ]}
-        />
-        {FONT_ORDER.map((f, i) => {
-          const selected = font === f;
+        style={[styles.popover, { left, top, backgroundColor: c.surface, borderColor: c.hairline, shadowColor: c.shadow }]}>
+        <View style={[styles.arrow, { left: arrowLeft, backgroundColor: c.surface, borderColor: c.hairline }]} />
+        {options.map((o, i) => {
+          const selected = value === o.value;
           return (
             <Pressable
-              key={f}
+              key={o.value}
               accessibilityRole="radio"
               accessibilityState={{ selected }}
-              accessibilityLabel={t.write.fonts[f]}
+              accessibilityLabel={o.label}
               onPress={() => {
                 tap();
-                onPick(f);
+                onPick(o.value);
                 onClose();
               }}
               style={({ pressed }) => [
@@ -126,9 +120,9 @@ export function FontPopover({
                 i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.hairline },
                 { opacity: pressed ? 0.6 : 1 },
               ]}>
-              <T style={{ fontFamily: WRITING_FONTS[f].family, fontSize: 20, lineHeight: 26, width: 36 }}>Aa</T>
+              {o.leading}
               <T variant="body" style={{ flex: 1 }}>
-                {t.write.fonts[f]}
+                {o.label}
               </T>
               {selected && <Icon name="check" size={18} color={c.ink} />}
             </Pressable>
@@ -137,6 +131,16 @@ export function FontPopover({
       </Animated.View>
     </View>
   );
+}
+
+// The typefaces as popover options, each led by "Aa" set in itself.
+export function useFontOptions() {
+  const t = useT();
+  return FONT_ORDER.map((f) => ({
+    value: f,
+    label: t.write.fonts[f],
+    leading: <T style={{ fontFamily: WRITING_FONTS[f].family, fontSize: 20, lineHeight: 26, width: 36 }}>Aa</T>,
+  }));
 }
 
 // The editor's settings: typeface (previewed live on the word UNLOAD), background sound and
