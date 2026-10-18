@@ -18,7 +18,7 @@ import { MACHINE, Rail, useCarriage } from '@/components/Machine';
 import { PaperTexture } from '@/components/PaperTexture';
 import { Dissolve } from '@/components/motion';
 import { T } from '@/components/T';
-import { WRITING_FONTS, WritingSettings, type WritingPrefs } from '@/components/WritingSettings';
+import { FontPopover, WRITING_FONTS, WritingSettings, type WritingPrefs } from '@/components/WritingSettings';
 import { PillButton, Sheet } from '@/components/ui';
 import { isSessionType, sessionMinutes, type SessionType, type SoundId } from '@/content/copy';
 import { useT } from '@/i18n';
@@ -46,8 +46,9 @@ const pickIndex = (length: number, not?: number | null) => {
 };
 
 const LINE = 32;
+const HEADER_HEIGHT = 60;
 // The paper fills the screen; this is where a line of text starts from its edge.
-const COLUMN_INSET = 30;
+const COLUMN_INSET = 20;
 
 // The last line as a greedy word wrap at `cols` characters would draw it. Only a fallback for
 // web, where the text field does not report its lines; native platforms give the real line.
@@ -93,6 +94,10 @@ export default function Write() {
   const face = WRITING_FONTS[prefs.font];
   // Before the very first session the settings open on their own.
   const [settingsOpen, setSettingsOpen] = useState(() => !data.settings.writingSetUp);
+  const [fontOpen, setFontOpen] = useState(false);
+  // Where the "Aa" button sits in the header, so the font bubble can hang right under it.
+  const [toolsX, setToolsX] = useState(0);
+  const [fontButtonX, setFontButtonX] = useState(0);
   const inputRef = useRef<TextInput>(null);
 
   const [text, setText] = useState('');
@@ -264,12 +269,17 @@ export default function Write() {
               </T>
             </View>
 
-            <View style={styles.tools}>
+            <View style={styles.tools} onLayout={(e) => setToolsX(e.nativeEvent.layout.x)}>
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={t.write.fontA11y(t.write.fonts[prefs.font])}
                 hitSlop={6}
-                onPress={openSettings}
+                onPress={() => {
+                  tap();
+                  Keyboard.dismiss();
+                  setFontOpen((open) => !open);
+                }}
+                onLayout={(e) => setFontButtonX(e.nativeEvent.layout.x + e.nativeEvent.layout.width / 2)}
                 style={({ pressed }) => [styles.button, { opacity: pressed ? 0.5 : 1 }]}>
                 <Text style={{ fontFamily: face.family, fontSize: 17, color: iconColor }}>Aa</Text>
               </Pressable>
@@ -297,8 +307,9 @@ export default function Write() {
             </View>
           </View>
 
+          {/* The writing area clips what is fed up past its top, so old lines never reach the header. */}
           <View
-            style={{ flex: 1 }}
+            style={styles.page}
             onLayout={(e) => setPaper({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
             {paper.h > 0 && (
               <>
@@ -414,11 +425,22 @@ export default function Write() {
               </>
             )}
           </View>
+
+          <FontPopover
+            visible={fontOpen}
+            font={prefs.font}
+            anchorX={toolsX + fontButtonX}
+            top={HEADER_HEIGHT - 2}
+            onPick={(font) => changePrefs({ font })}
+            onClose={() => {
+              setFontOpen(false);
+              setTimeout(() => inputRef.current?.focus(), 250);
+            }}
+          />
         </KeyboardAvoidingView>
       </SafeAreaView>
 
       <WritingSettings visible={settingsOpen} prefs={prefs} onChange={changePrefs} onClose={closeSettings} />
-
       <Sheet visible={leaving} onClose={() => setLeaving(false)} title={t.write.leaveTitle}>
         <View style={{ gap: 10 }}>
           {text.trim() ? (
@@ -451,7 +473,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: space.md,
-    height: 60,
+    height: HEADER_HEIGHT,
   },
   button: {
     width: 38,
@@ -463,6 +485,7 @@ const styles = StyleSheet.create({
   title: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
   clock: { fontVariant: ['tabular-nums'], marginTop: 1 },
   tools: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  page: { flex: 1, overflow: 'hidden' },
   column: { position: 'absolute', left: COLUMN_INSET, right: COLUMN_INSET },
   mirrorBox: { position: 'absolute', left: 0, right: 0, top: 0, opacity: 0 },
   mirror: { position: 'absolute', left: 0, right: 0 },

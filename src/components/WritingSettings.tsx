@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import { Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import Animated, { FadeIn, FadeOut, ZoomIn } from 'react-native-reanimated';
 
 import { SOUNDS, type SoundId } from '@/content/copy';
 import { useT } from '@/i18n';
@@ -20,9 +20,124 @@ export const WRITING_FONTS: Record<WritingFont, { family: string; size: number }
   serif: { family: fonts.serif, size: 21 },
   sans: { family: fonts.sans, size: 18 },
 };
-const FONT_ORDER: WritingFont[] = ['mono', 'serif', 'sans'];
+const FONT_ORDER: WritingFont[] = ['serif', 'sans', 'mono'];
 
 export type WritingPrefs = { font: WritingFont; sound: SoundId; companion: boolean };
+
+// The three faces side by side, each showing "Aa" in itself.
+function FontTiles({ value, onPick }: { value: WritingFont; onPick: (font: WritingFont) => void }) {
+  const { c } = useTheme();
+  const t = useT();
+  return (
+    <View style={styles.fonts}>
+      {FONT_ORDER.map((f) => {
+        const selected = value === f;
+        return (
+          <Pressable
+            key={f}
+            accessibilityRole="radio"
+            accessibilityState={{ selected }}
+            accessibilityLabel={t.write.fonts[f]}
+            onPress={() => {
+              tap();
+              onPick(f);
+            }}
+            style={({ pressed }) => [
+              styles.font,
+              {
+                backgroundColor: selected ? c.ink : c.surface,
+                borderColor: selected ? c.ink : c.hairline,
+                opacity: pressed ? 0.75 : 1,
+              },
+            ]}>
+            <T style={{ fontFamily: WRITING_FONTS[f].family, fontSize: 24, lineHeight: 30, color: selected ? c.onInk : c.ink }}>
+              Aa
+            </T>
+            <T variant="small" style={{ color: selected ? c.onInk : c.inkSoft }} numberOfLines={1}>
+              {t.write.fonts[f]}
+            </T>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+const POPOVER_W = 212;
+const ARROW = 12;
+
+// Just the typeface, from the editor's "Aa": a small bubble hanging under the icon.
+// A tap picks a face and closes it; a tap anywhere else just closes it.
+export function FontPopover({
+  visible,
+  font,
+  anchorX,
+  top,
+  onPick,
+  onClose,
+}: {
+  visible: boolean;
+  font: WritingFont;
+  // Centre of the "Aa" button and the bubble's top edge, in the parent's coordinates.
+  anchorX: number;
+  top: number;
+  onPick: (font: WritingFont) => void;
+  onClose: () => void;
+}) {
+  const { c } = useTheme();
+  const t = useT();
+  const { width } = useWindowDimensions();
+  if (!visible) return null;
+  // Kept on screen with a small margin; the pointer still aims at the icon.
+  const left = Math.max(12, Math.min(width - POPOVER_W - 12, anchorX - POPOVER_W / 2));
+  const arrowLeft = Math.max(16, Math.min(POPOVER_W - 16 - ARROW, anchorX - left - ARROW / 2));
+
+  return (
+    <View style={StyleSheet.absoluteFill}>
+      <Pressable accessibilityLabel={t.common.close} style={StyleSheet.absoluteFill} onPress={onClose} />
+      <Animated.View
+        entering={ZoomIn.duration(170).withInitialValues({ transform: [{ scale: 0.92 }] })}
+        exiting={FadeOut.duration(120)}
+        style={[
+          styles.popover,
+          { left, top, backgroundColor: c.surface, borderColor: c.hairline, shadowColor: c.shadow },
+        ]}>
+        <View
+          style={[
+            styles.arrow,
+            { left: arrowLeft, backgroundColor: c.surface, borderColor: c.hairline },
+          ]}
+        />
+        {FONT_ORDER.map((f, i) => {
+          const selected = font === f;
+          return (
+            <Pressable
+              key={f}
+              accessibilityRole="radio"
+              accessibilityState={{ selected }}
+              accessibilityLabel={t.write.fonts[f]}
+              onPress={() => {
+                tap();
+                onPick(f);
+                onClose();
+              }}
+              style={({ pressed }) => [
+                styles.option,
+                i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.hairline },
+                { opacity: pressed ? 0.6 : 1 },
+              ]}>
+              <T style={{ fontFamily: WRITING_FONTS[f].family, fontSize: 20, lineHeight: 26, width: 36 }}>Aa</T>
+              <T variant="body" style={{ flex: 1 }}>
+                {t.write.fonts[f]}
+              </T>
+              {selected && <Icon name="check" size={18} color={c.ink} />}
+            </Pressable>
+          );
+        })}
+      </Animated.View>
+    </View>
+  );
+}
 
 // The editor's settings: typeface (previewed live on the word UNLOAD), background sound and
 // supportive phrases. Shown before the first session, then from the editor's top right corner.
@@ -64,37 +179,7 @@ export function WritingSettings({
         <T variant="label" style={styles.label}>
           {t.write.font}
         </T>
-        <View style={styles.fonts}>
-          {FONT_ORDER.map((f) => {
-            const selected = prefs.font === f;
-            return (
-              <Pressable
-                key={f}
-                accessibilityRole="radio"
-                accessibilityState={{ selected }}
-                accessibilityLabel={t.write.fonts[f]}
-                onPress={() => {
-                  tap();
-                  onChange({ font: f });
-                }}
-                style={({ pressed }) => [
-                  styles.font,
-                  {
-                    backgroundColor: selected ? c.ink : c.surface,
-                    borderColor: selected ? c.ink : c.hairline,
-                    opacity: pressed ? 0.75 : 1,
-                  },
-                ]}>
-                <T style={{ fontFamily: WRITING_FONTS[f].family, fontSize: 24, lineHeight: 30, color: selected ? c.onInk : c.ink }}>
-                  Aa
-                </T>
-                <T variant="small" style={{ color: selected ? c.onInk : c.inkSoft }} numberOfLines={1}>
-                  {t.write.fonts[f]}
-                </T>
-              </Pressable>
-            );
-          })}
-        </View>
+        <FontTiles value={prefs.font} onPick={(font) => onChange({ font })} />
 
         <T variant="label" style={styles.label}>
           {t.write.sound}
@@ -162,6 +247,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  popover: {
+    position: 'absolute',
+    width: POPOVER_W,
+    borderRadius: 16,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 14,
+    shadowOpacity: 0.16,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
+  },
+  // A small square turned 45°, half hidden behind the bubble: the pointer to the icon.
+  arrow: {
+    position: 'absolute',
+    top: -ARROW / 2,
+    width: ARROW,
+    height: ARROW,
+    borderLeftWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    transform: [{ rotate: '45deg' }],
+  },
+  option: { flexDirection: 'row', alignItems: 'center', gap: 10, height: 50 },
   soundHint: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: space.sm, minHeight: 20 },
   toggleRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: space.md },
   note: { marginTop: space.lg },

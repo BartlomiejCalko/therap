@@ -223,7 +223,7 @@ export const en = {
     settingsTitle: 'Writing settings',
     font: 'Typeface',
     fonts: { mono: 'Typewriter', serif: 'Serif', sans: 'Sans serif' },
-    fontA11y: (name: string) => `Typeface: ${name}. Open writing settings`,
+    fontA11y: (name: string) => `Typeface: ${name}. Change typeface`,
     sound: 'Background sound',
     soundHint: 'Tap a sound to hear a short sample.',
     soundPlaying: (name: string) => `Playing a sample: ${name}`,

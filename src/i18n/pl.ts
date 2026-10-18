@@ -242,7 +242,7 @@ export const pl: Dict = {
     settingsTitle: 'Ustawienia pisania',
     font: 'Czcionka',
     fonts: { mono: 'Maszynowa', serif: 'Szeryfowa', sans: 'Bezszeryfowa' },
-    fontA11y: (name: string) => `Czcionka: ${name}. Otwórz ustawienia pisania`,
+    fontA11y: (name: string) => `Czcionka: ${name}. Zmień czcionkę`,
     sound: 'Dźwięk w tle',
     soundHint: 'Dotknij dźwięku, żeby usłyszeć krótką próbkę.',
     soundPlaying: (name: string) => `Odtwarzam próbkę: ${name}`,
