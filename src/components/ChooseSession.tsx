@@ -18,7 +18,8 @@ import { fonts, space } from '@/theme/tokens';
 import { T } from './T';
 import { CircleButton, PillButton } from './ui';
 
-const THUMB = 62;
+const PILL_W = 44;
+const PILL_H = 66;
 
 // The session picker, as a single painted page: the chosen session's watercolour fills the top
 // and fades into the paper; below it, its name and length, a line about what it is for, the
@@ -89,8 +90,47 @@ export function ChooseSession({
         </Pressable>
       </View>
 
-      <View style={[styles.body, { paddingBottom: bottomInset + space.md }]}>
-        <Animated.View key={selected} entering={FadeIn.duration(320)}>
+      {/* Fills the screen to push its content down; its empty part lets touches through. */}
+      <View pointerEvents="box-none" style={[styles.body, { paddingBottom: bottomInset + space.md }]}>
+        {/* The four sessions as slim painted pills, side by side in a glass bar above the words. */}
+        <View style={[styles.rail, { backgroundColor: c.veil, borderColor: c.hairline }]}>
+          {SESSIONS.map((s) => {
+            const on = s.id === selected;
+            return (
+              <Pressable
+                key={s.id}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: on }}
+                accessibilityLabel={t.choose.a11y(t.sessions[s.id].name, s.minutes, t.sessions[s.id].line)}
+                onPress={() => {
+                  if (on) return;
+                  tap();
+                  setSelected(s.id);
+                }}
+                style={styles.option}>
+                <View style={[styles.pillRing, { borderColor: on ? c.gold : 'transparent' }]}>
+                  <Image
+                    source={art(s.id)}
+                    contentFit="cover"
+                    cachePolicy="memory"
+                    transition={0}
+                    style={[styles.pill, { opacity: on ? 1 : 0.72 }]}
+                  />
+                </View>
+                <T style={[styles.pillName, { color: on ? c.ink : c.inkSoft }]} numberOfLines={1}>
+                  {t.sessions[s.id].name}
+                </T>
+                <T variant="small" style={[styles.pillMinutes, { color: c.inkFaint }]}>
+                  {t.common.minutes(s.minutes)}
+                </T>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        {/* A fixed height, room enough for the longest session's words, so switching sessions
+            never moves the bar above. */}
+        <Animated.View key={selected} entering={FadeIn.duration(320)} style={styles.words}>
           <T variant="label" style={{ color: c.inkSoft }}>
             {copy.name} · {t.common.minutes(session.minutes)}
           </T>
@@ -108,32 +148,6 @@ export function ChooseSession({
           style={{ marginTop: space.lg }}
         />
 
-        <View style={styles.picker}>
-          {SESSIONS.map((s) => {
-            const on = s.id === selected;
-            return (
-              <Pressable
-                key={s.id}
-                accessibilityRole="radio"
-                accessibilityState={{ selected: on }}
-                accessibilityLabel={t.choose.a11y(t.sessions[s.id].name, s.minutes, t.sessions[s.id].line)}
-                onPress={() => {
-                  if (on) return;
-                  tap();
-                  setSelected(s.id);
-                }}
-                style={styles.option}>
-                <View style={[styles.ring, { borderColor: on ? c.gold : 'transparent' }]}>
-                  <Image source={art(s.id)} contentFit="cover" cachePolicy="memory" transition={0} style={styles.thumb} />
-                </View>
-                <T style={[styles.optionName, { color: c.ink }]}>{t.sessions[s.id].name}</T>
-                <T variant="small" tone="faint" style={{ fontSize: 12, lineHeight: 15 }}>
-                  {t.common.minutes(s.minutes)}
-                </T>
-              </Pressable>
-            );
-          })}
-        </View>
       </View>
     </View>
   );
@@ -154,9 +168,19 @@ const styles = StyleSheet.create({
   body: { flex: 1, justifyContent: 'flex-end', paddingHorizontal: space.gutter + 4 },
   title: { fontFamily: fonts.serif, fontSize: 40, lineHeight: 43, letterSpacing: -0.5, marginTop: space.sm },
   detail: { marginTop: space.sm, maxWidth: 320 },
-  picker: { flexDirection: 'row', justifyContent: 'space-between', marginTop: space.lg },
-  option: { alignItems: 'center', width: 78 },
-  ring: { padding: 3, borderRadius: (THUMB + 10) / 2, borderWidth: 1.5 },
-  thumb: { width: THUMB, height: THUMB, borderRadius: THUMB / 2 },
-  optionName: { fontFamily: fonts.serif, fontSize: 17, lineHeight: 21, marginTop: 6 },
+  rail: {
+    flexDirection: 'row',
+    alignSelf: 'stretch',
+    paddingVertical: 12,
+    paddingHorizontal: 6,
+    borderRadius: 26,
+    borderWidth: StyleSheet.hairlineWidth,
+    marginBottom: space.lg,
+  },
+  option: { flex: 1, alignItems: 'center' },
+  words: { height: 214 },
+  pillRing: { padding: 2.5, borderRadius: (PILL_W + 9) / 2, borderWidth: 1.5 },
+  pill: { width: PILL_W, height: PILL_H, borderRadius: PILL_W / 2 },
+  pillName: { fontFamily: fonts.serif, fontSize: 16, lineHeight: 20, marginTop: 6 },
+  pillMinutes: { fontSize: 11, lineHeight: 14 },
 });
