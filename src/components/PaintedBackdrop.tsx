@@ -1,4 +1,6 @@
-import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Image } from 'expo-image';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import type { SessionType } from '@/content/copy';
@@ -20,12 +22,16 @@ export function PaintedBackdrop({
 }) {
   const { c, scheme } = useTheme();
   const { width, height: screen } = useWindowDimensions();
-  const h = screen * height;
+  const { top } = useSafeAreaInsets();
+  // Reaches up under the status bar, so the painting starts at the very top of the screen.
+  const h = screen * height + top;
   return (
-    <View pointerEvents="none" style={[styles.wrap, { height: h }]}>
+    <View pointerEvents="none" style={[styles.wrap, { top: -top, height: h }]}>
       <Image
         source={SESSION_ART[art][scheme === 'dark' ? 'dark' : 'light']}
-        resizeMode="cover"
+        contentFit="cover"
+        cachePolicy="memory"
+        transition={0}
         style={{ width, height: h, opacity }}
       />
       <Svg width={width} height={h} viewBox="0 0 1 1" preserveAspectRatio="none" style={StyleSheet.absoluteFill}>

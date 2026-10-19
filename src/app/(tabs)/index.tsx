@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image } from 'expo-image';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { SessionTile } from '@/components/Cards';
@@ -91,7 +92,7 @@ export default function Today() {
                   {t.today.stateLines[state]}
                 </T>
               </View>
-              <Image source={STATE_ART[state]} resizeMode="contain" style={styles.stateArt} />
+              <Image source={STATE_ART[state]} contentFit="contain" cachePolicy="memory" transition={0} style={styles.stateArt} />
               <Icon name="arrow" size={16} color={c.inkFaint} />
             </InkPress>
           </FadeIn>
@@ -110,7 +111,13 @@ export default function Today() {
           }}
           style={[styles.sessionCard, { backgroundColor: c.surface, borderColor: c.hairline }]}>
           <View pointerEvents="none" style={styles.sessionPaint}>
-            <Image source={SESSION_ART.pause[dark ? 'dark' : 'light']} resizeMode="cover" style={styles.sessionImage} />
+            <Image
+              source={SESSION_ART.pause[dark ? 'dark' : 'light']}
+              contentFit="cover"
+              cachePolicy="memory"
+              transition={0}
+              style={styles.sessionImage}
+            />
             <Svg width="100%" height="100%" viewBox="0 0 1 1" style={StyleSheet.absoluteFill} preserveAspectRatio="none">
               <Defs>
                 <LinearGradient id="session-card-fade" x1="0" y1="0" x2="1" y2="0">

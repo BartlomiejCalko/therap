@@ -1,12 +1,11 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Image, KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'react-native';
 
 import { T } from '@/components/T';
 import { PaintedBackdrop } from '@/components/PaintedBackdrop';
 import { CircleButton, PillButton, Screen, TopBar } from '@/components/ui';
 import { type CheckinState, type SessionType } from '@/content/copy';
-import { STATE_ART } from '@/content/sessionArt';
 import { useT } from '@/i18n';
 import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
@@ -40,12 +39,6 @@ export default function Checkin() {
 
         {/* Everything is on screen at once, resting just above the keyboard. */}
         <View style={styles.body}>
-          <Image
-            source={STATE_ART[state]}
-            resizeMode="contain"
-            accessibilityLabel={t.states[state]}
-            style={styles.scene}
-          />
           <T style={[styles.question, { color: c.ink }]}>{t.checkin.question}</T>
           <T variant="small" tone="faint" style={{ marginTop: space.xs }}>
             {t.checkin.hint}
@@ -74,7 +67,6 @@ export default function Checkin() {
 
 const styles = StyleSheet.create({
   body: { flex: 1, justifyContent: 'flex-end', paddingBottom: space.sm },
-  scene: { width: 132, height: 132, alignSelf: 'center', marginBottom: space.lg },
   question: { fontFamily: fonts.serif, fontSize: 34, lineHeight: 38, letterSpacing: -0.3 },
   input: {
     fontFamily: fonts.serif,

@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Image, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Image } from 'expo-image';
+import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
@@ -55,7 +56,7 @@ export function ChooseSession({
           entering={FadeIn.duration(450)}
           exiting={FadeOut.duration(450)}
           style={StyleSheet.absoluteFill}>
-          <Image source={art(selected)} resizeMode="cover" style={{ width, height: paintHeight }} />
+          <Image source={art(selected)} contentFit="cover" cachePolicy="memory" transition={0} style={{ width, height: paintHeight }} />
         </Animated.View>
         {/* The lower part of the painting dissolves into the paper. */}
         <Svg width="100%" height={paintHeight * 0.55} style={styles.fade} preserveAspectRatio="none">
@@ -123,7 +124,7 @@ export function ChooseSession({
                 }}
                 style={styles.option}>
                 <View style={[styles.ring, { borderColor: on ? c.gold : 'transparent' }]}>
-                  <Image source={art(s.id)} resizeMode="cover" style={styles.thumb} />
+                  <Image source={art(s.id)} contentFit="cover" cachePolicy="memory" transition={0} style={styles.thumb} />
                 </View>
                 <T style={[styles.optionName, { color: c.ink }]}>{t.sessions[s.id].name}</T>
                 <T variant="small" tone="faint" style={{ fontSize: 12, lineHeight: 15 }}>

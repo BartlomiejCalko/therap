@@ -16,6 +16,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { LockGate } from '@/components/LockGate';
+import { preloadArt } from '@/content/sessionArt';
 import { I18nProvider, useLang } from '@/i18n';
 import { StoreProvider, useStore } from '@/store/store';
 import { AppThemeProvider, useTheme } from '@/theme/theme';
@@ -57,6 +58,10 @@ export default function RootLayout() {
 
 function Root({ fontsLoaded }: { fontsLoaded: boolean }) {
   const { ready } = useStore();
+  // The session paintings are decoded once, up front, so no screen waits on them later.
+  useEffect(() => {
+    preloadArt();
+  }, []);
   const { c, scheme } = useTheme();
   const lang = useLang();
 
@@ -85,6 +90,9 @@ function Root({ fontsLoaded }: { fontsLoaded: boolean }) {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="welcome" options={{ animation: 'fade' }} />
           <Stack.Screen name="affirmation" options={{ animation: 'none' }} />
+          {/* A soft fade: the keyboard opens with this screen, and a sideways slide would show the
+              question riding up on it. */}
+          <Stack.Screen name="checkin" options={{ animation: 'fade', animationDuration: 260 }} />
           <Stack.Screen name="how-to-write" options={{ presentation: 'modal' }} />
           <Stack.Screen name="session/write" options={{ gestureEnabled: false, animation: 'fade' }} />
           <Stack.Screen name="session/ground" options={{ animation: 'fade' }} />
