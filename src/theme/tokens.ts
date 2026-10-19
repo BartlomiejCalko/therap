@@ -1,7 +1,9 @@
-// Design tokens. Warm paper + sumi ink, one vermilion accent used sparingly.
+// Design tokens. Cream watercolour paper with warm ink, a thread of gold, and one deep forest
+// green for the main call to action. Dark mode is the same paintings at night.
 
 export type Palette = {
   bg: string;
+  // Cards: a soft, slightly translucent paper over the watercolours.
   surface: string;
   surfaceAlt: string;
   ink: string;
@@ -12,56 +14,67 @@ export type Palette = {
   onInk: string;
   scrim: string;
   shadow: string;
-  // Tonal paper for cards — the text-only answer to Cosmos's image grid.
   tones: [string, string, string, string];
-  // Four washed-out pastels, used sparingly on Today.
+  // Four washed-out pastels, used behind small illustrations.
   pastel: { peach: string; lavender: string; sage: string; mist: string };
-  // Soft surface laid over pastel cards (for small round buttons).
+  // Soft surface laid over pictures (round header buttons).
   veil: string;
+  // The thread of gold: the selected ring, small rules, the ensō.
+  gold: string;
+  // The main call to action: deep forest green on paper; at night each session lends its own tint.
+  primary: string;
+  onPrimary: string;
 };
 
 export const palettes: Record<'light' | 'dark', Palette> = {
   light: {
-    bg: '#F3F1EC',
-    surface: '#FBFAF7',
-    surfaceAlt: '#E8E5DE',
-    // A warm charcoal rather than near-black, so dark elements sit on the paper instead of punching through it.
-    ink: '#2E2B27',
-    inkSoft: '#625E57',
-    inkFaint: '#9C988F',
-    hairline: 'rgba(27,26,24,0.12)',
-    accent: '#B5462F',
-    onInk: '#F3F1EC',
-    scrim: 'rgba(20,19,17,0.28)',
-    shadow: '#3A352C',
-    tones: ['#FBFAF7', '#ECE8E0', '#E3E6E0', '#E7E4EA'],
-    pastel: { peach: '#F4E5DA', lavender: '#E8E4F2', sage: '#E1E9DE', mist: '#DDE7EE' },
-    veil: 'rgba(255,255,255,0.6)',
+    bg: '#F6F1E9',
+    surface: 'rgba(255,253,249,0.86)',
+    surfaceAlt: '#EDE6DA',
+    ink: '#2A2621',
+    inkSoft: '#5E5850',
+    inkFaint: '#9B948A',
+    hairline: 'rgba(42,38,33,0.11)',
+    accent: '#B5683F',
+    onInk: '#F6F1E9',
+    scrim: 'rgba(30,26,20,0.28)',
+    shadow: '#4A3F30',
+    tones: ['#FBF7F1', '#EFE8DD', '#E6EBE2', '#ECE6EE'],
+    pastel: { peach: '#F3E3DA', lavender: '#E9E3F0', sage: '#E2E9DF', mist: '#DFE7EE' },
+    veil: 'rgba(255,253,249,0.78)',
+    gold: '#C4A066',
+    primary: '#24362D',
+    onPrimary: '#F6F1E9',
   },
   dark: {
-    bg: '#121110',
-    surface: '#1C1B19',
-    surfaceAlt: '#282623',
-    ink: '#ECE8E0',
-    inkSoft: '#A7A299',
-    inkFaint: '#6F6B64',
-    hairline: 'rgba(236,232,224,0.12)',
-    accent: '#D26A50',
-    onInk: '#121110',
-    scrim: 'rgba(0,0,0,0.5)',
+    bg: '#121311',
+    surface: 'rgba(32,33,30,0.86)',
+    surfaceAlt: '#262722',
+    ink: '#EFEAE1',
+    inkSoft: '#B3ADA3',
+    inkFaint: '#7D786F',
+    hairline: 'rgba(239,234,225,0.13)',
+    accent: '#D9A27A',
+    onInk: '#121311',
+    scrim: 'rgba(0,0,0,0.55)',
     shadow: '#000000',
-    tones: ['#1C1B19', '#23211E', '#1D201D', '#211F24'],
-    pastel: { peach: '#2A2320', lavender: '#24222C', sage: '#1F2620', mist: '#1D2429' },
-    veil: 'rgba(255,255,255,0.07)',
+    tones: ['#1E1F1C', '#25241F', '#1F2420', '#232129'],
+    pastel: { peach: '#3A2D2A', lavender: '#2D2938', sage: '#263029', mist: '#252D36' },
+    veil: 'rgba(20,21,19,0.55)',
+    gold: '#D4B27A',
+    primary: '#5D6B5E',
+    onPrimary: '#F3EEE5',
   },
 };
 
 export const fonts = {
-  serifLight: 'Newsreader_300Light',
-  serifLightItalic: 'Newsreader_300Light_Italic',
-  serif: 'Newsreader_400Regular',
-  serifItalic: 'Newsreader_400Regular_Italic',
-  serifMedium: 'Newsreader_500Medium',
+  // Cormorant Garamond: the high-contrast serif of the reference designs, for headings and calls
+  // to action. It runs small, so it is set a little larger than a book face would be.
+  serifLight: 'CormorantGaramond_500Medium',
+  serifLightItalic: 'CormorantGaramond_500Medium_Italic',
+  serif: 'CormorantGaramond_500Medium',
+  serifItalic: 'CormorantGaramond_400Regular_Italic',
+  serifMedium: 'CormorantGaramond_600SemiBold',
   sans: 'Inter_400Regular',
   sansMedium: 'Inter_500Medium',
   // The typewriter face belongs to the writing machine alone.
@@ -79,10 +92,10 @@ export const space = {
 } as const;
 
 export const radius = {
-  card: 18,
+  card: 20,
   pill: 999,
-  // Calls to action: a soft rectangle rather than a pill.
-  button: 14,
+  // Calls to action: generously rounded, nearly a pill.
+  button: 26,
 } as const;
 
 // Leaves room for the floating pill tab bar.

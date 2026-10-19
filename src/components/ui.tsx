@@ -15,7 +15,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { tap } from '@/lib/haptics';
 import { useTheme } from '@/theme/theme';
-import { radius, space, TAB_BAR_SPACE } from '@/theme/tokens';
+import { fonts, radius, space, TAB_BAR_SPACE } from '@/theme/tokens';
 
 import { Icon, type IconName } from './Icon';
 import { PaperTexture } from './PaperTexture';
@@ -138,6 +138,7 @@ export function PillButton({
   disabled,
   style,
   grow,
+  tint,
 }: {
   title: string;
   onPress?: () => void;
@@ -146,10 +147,12 @@ export function PillButton({
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
   grow?: boolean;
+  // A colour for the primary button other than the forest green (a session's own tint at night).
+  tint?: string;
 }) {
   const { c } = useTheme();
   const primary = kind === 'primary';
-  const fg = primary ? c.onInk : c.ink;
+  const fg = primary ? c.onPrimary : c.ink;
   return (
     <Pressable
       accessibilityRole="button"
@@ -160,17 +163,21 @@ export function PillButton({
       }}
       style={({ pressed }) => [
         styles.pill,
-        primary && { backgroundColor: c.ink },
+        primary && { backgroundColor: tint ?? c.primary },
         kind === 'secondary' && { borderWidth: 1, borderColor: c.hairline, backgroundColor: c.surface },
         kind === 'ghost' && { paddingHorizontal: space.md },
+        // The label stays centred; the arrow sits at the far edge, as in the reference designs.
+        icon && styles.pillWithIcon,
         grow && { flex: 1 },
-        { opacity: disabled ? 0.35 : pressed ? 0.7 : 1 },
+        { opacity: disabled ? 0.35 : pressed ? 0.8 : 1 },
         style,
       ]}>
-      <T variant="medium" style={{ color: fg }}>
-        {title}
-      </T>
-      {icon && <Icon name={icon} size={17} color={fg} />}
+      <T style={[styles.pillLabel, { color: fg }, !primary && styles.pillLabelQuiet]}>{title}</T>
+      {icon && (
+        <View style={styles.pillIcon}>
+          <Icon name={icon} size={20} color={fg} />
+        </View>
+      )}
     </Pressable>
   );
 }
@@ -428,8 +435,12 @@ const styles = StyleSheet.create({
     marginTop: space.xl,
     marginBottom: space.md,
   },
+  pillLabel: { fontFamily: fonts.serif, fontSize: 20, lineHeight: 24, letterSpacing: 0.1 },
+  pillLabelQuiet: { fontFamily: fonts.sansMedium, fontSize: 15, lineHeight: 20 },
+  pillWithIcon: { paddingHorizontal: 56 },
+  pillIcon: { position: 'absolute', right: 22, top: 0, bottom: 0, justifyContent: 'center' },
   pill: {
-    height: 52,
+    height: 56,
     borderRadius: radius.button,
     paddingHorizontal: space.lg,
     flexDirection: 'row',

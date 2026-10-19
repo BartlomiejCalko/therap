@@ -86,10 +86,26 @@ export const pl: Dict = {
   },
 
   sessions: {
-    pause: { name: 'Pauza', line: 'Ukój bieżące napięcie.' },
-    clarity: { name: 'Jasność', line: 'Uporządkuj myśli i wyostrz skupienie.' },
-    space: { name: 'Przestrzeń', line: 'Zrób porządek w głowie i miejsce na oddech.' },
-    release: { name: 'Uwolnienie', line: 'Odłóż to, co dźwigasz od dawna.' },
+    pause: {
+      name: 'Pauza',
+      line: 'Uspokój bieżące napięcie.',
+      detail: 'Zatrzymaj się na chwilę. Daj swoim myślom miejsce. Nie musisz teraz niczego rozwiązywać.',
+    },
+    clarity: {
+      name: 'Jasność',
+      line: 'Uporządkuj myśli i wyostrz skupienie.',
+      detail: 'Zbierz wątki w jednym miejscu. Zauważ, co jest ważne, i zobacz, co dalej.',
+    },
+    space: {
+      name: 'Przestrzeń',
+      line: 'Zrób porządek w głowie i miejsce na oddech.',
+      detail: 'Pozwól, żeby to, co nagromadzone, zyskało przestrzeń. Poczuj więcej lekkości.',
+    },
+    release: {
+      name: 'Uwolnienie',
+      line: 'Odłóż to, co dźwigasz od dawna.',
+      detail: 'Daj temu wypłynąć na kartkę. Poczuj, jak napięcie stopniowo ustępuje.',
+    },
   },
 
   sounds: {
@@ -138,6 +154,7 @@ export const pl: Dict = {
     subtitle: 'Twoje myśli mają dokąd pójść.',
     question: 'Co masz teraz w głowie?',
     chooseSession: 'Wybierz sesję',
+    sessionKicker: 'Sesje · 5–50 min',
     chooseSessionHint: 'Od razu do pisania',
     chooseSessionLine: 'Cztery długości ciszy, od 5 do 50 minut. Wybierz jedną i przelej myśli na kartkę.',
     guideLabel: 'Przewodnik',
@@ -164,6 +181,7 @@ export const pl: Dict = {
   checkin: {
     question: 'Gdyby to miało nazwę, jak by brzmiała?',
     hint: 'Wystarczy jedno albo kilka słów.',
+    placeholder: 'Jeden wyraz…',
     forward: 'Dalej',
   },
 
@@ -178,6 +196,7 @@ export const pl: Dict = {
     unloading: 'Zrzucasz z głowy',
     cameWith: 'Przychodzisz z',
     howToWrite: 'Zobacz, jak pisać',
+    pick: 'Wybierz tę sesję',
     a11y: (name, minutes, line) => `${name}, ${minutes} ${pluralPl(minutes, 'minuta', 'minuty', 'minut')}. ${line}`,
   },
 

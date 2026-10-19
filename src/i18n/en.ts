@@ -70,10 +70,26 @@ export const en = {
   },
 
   sessions: {
-    pause: { name: 'Pause', line: 'Settle immediate tension.' },
-    clarity: { name: 'Clarity', line: 'Organize thoughts and sharpen focus.' },
-    space: { name: 'Space', line: 'Clear mental clutter and make room to breathe.' },
-    release: { name: 'Release', line: "Let go of what you've been carrying." },
+    pause: {
+      name: 'Pause',
+      line: 'Settle immediate tension.',
+      detail: "Stop for a moment. Give your thoughts some room. You don't have to solve anything right now.",
+    },
+    clarity: {
+      name: 'Clarity',
+      line: 'Organize thoughts and sharpen focus.',
+      detail: 'Gather the threads in one place. Notice what matters, and see what comes next.',
+    },
+    space: {
+      name: 'Space',
+      line: 'Clear mental clutter and make room to breathe.',
+      detail: 'Let what has piled up find some room. Feel a little lighter.',
+    },
+    release: {
+      name: 'Release',
+      line: "Let go of what you've been carrying.",
+      detail: 'Let it flow out onto the page. Feel the tension ease, bit by bit.',
+    },
   },
 
   sounds: {
@@ -122,6 +138,7 @@ export const en = {
     subtitle: 'Your thoughts have somewhere to go.',
     question: "What's on your mind right now?",
     chooseSession: 'Choose a session',
+    sessionKicker: 'Sessions · 5–50 min',
     chooseSessionHint: 'Straight to writing',
     chooseSessionLine: 'Four lengths of quiet, from 5 to 50 minutes. Pick one and empty your head onto the page.',
     guideLabel: 'Guide',
@@ -145,6 +162,7 @@ export const en = {
   checkin: {
     question: 'If it had a name, what would it be?',
     hint: 'One word or a few is enough.',
+    placeholder: 'One word…',
     forward: 'Forward',
   },
 
@@ -159,6 +177,7 @@ export const en = {
     unloading: 'Unloading',
     cameWith: 'You came with',
     howToWrite: 'See how to write',
+    pick: 'Choose this session',
     a11y: (name: string, minutes: number, line: string) => `${name}, ${minutes} minutes. ${line}`,
   },
 

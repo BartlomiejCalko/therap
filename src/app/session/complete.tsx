@@ -14,6 +14,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { toneFor } from '@/components/Cards';
 import { Enso } from '@/components/Enso';
+import { PaintedBackdrop } from '@/components/PaintedBackdrop';
 import { Glyph } from '@/components/Glyph';
 import { Dissolve } from '@/components/motion';
 import { T } from '@/components/T';
@@ -82,6 +83,7 @@ export default function Complete() {
 
   return (
     <Screen edges={['top', 'bottom']} contentStyle={{ flexGrow: 1 }}>
+      <PaintedBackdrop art={session.type} height={0.45} opacity={0.55} />
       <View style={styles.hero}>
         <Enso size={128} />
         <FadeIn delay={1600} style={{ alignItems: 'center' }}>

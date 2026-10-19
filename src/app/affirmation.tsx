@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
+import { PaintedBackdrop } from '@/components/PaintedBackdrop';
 import { T } from '@/components/T';
 import { CircleButton, PillButton, Screen, TopBar } from '@/components/ui';
 import { useT } from '@/i18n';
@@ -12,13 +13,14 @@ export default function Affirmation() {
 
   return (
     <Screen scroll={false} edges={['top', 'bottom']}>
+      <PaintedBackdrop art="clarity" height={1} opacity={0.5} />
       <TopBar left={<CircleButton icon="back" label={t.common.back} onPress={() => router.back()} />} />
       {/* Appears whole and at once: nothing here should slow the person down. */}
       <View style={styles.center}>
-        <T variant="display" center style={{ fontFamily: fonts.serifMedium, fontSize: 32, lineHeight: 40 }}>
+        <T variant="display" center style={{ fontFamily: fonts.serifMedium, fontSize: 36, lineHeight: 41 }}>
           {t.affirmation.title}
         </T>
-        <T variant="serif" tone="soft" center style={{ marginTop: space.md, fontSize: 20, lineHeight: 28 }}>
+        <T variant="serif" tone="soft" center style={{ marginTop: space.md, fontSize: 24, lineHeight: 31 }}>
           {t.affirmation.subtitle}
         </T>
       </View>

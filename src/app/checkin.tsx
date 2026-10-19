@@ -1,15 +1,24 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'react-native';
 
 import { T } from '@/components/T';
-import { StateMotion } from '@/components/StateMotion';
+import { PaintedBackdrop } from '@/components/PaintedBackdrop';
 import { CircleButton, PillButton, Screen, TopBar } from '@/components/ui';
-import { type CheckinState } from '@/content/copy';
+import { type CheckinState, type SessionType } from '@/content/copy';
+import { STATE_ART } from '@/content/sessionArt';
 import { useT } from '@/i18n';
 import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
 import { fonts, space } from '@/theme/tokens';
+
+// Each state borrows the session painting closest to its colour.
+const BACKDROP: Record<CheckinState, SessionType> = {
+  'too-much': 'pause',
+  scattered: 'space',
+  stuck: 'clarity',
+  weighing: 'release',
+};
 
 export default function Checkin() {
   const { c } = useTheme();
@@ -26,14 +35,18 @@ export default function Checkin() {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Screen scroll={false} edges={['top', 'bottom']}>
+        <PaintedBackdrop art={BACKDROP[state]} height={0.5} opacity={0.6} />
         <TopBar left={<CircleButton icon="back" label={t.common.back} onPress={() => router.back()} />} />
 
-        {/* Everything is on screen at once; only the small scene above the question moves. */}
+        {/* Everything is on screen at once, resting just above the keyboard. */}
         <View style={styles.body}>
-          <View style={styles.scene}>
-            <StateMotion state={state} label={t.states[state]} />
-          </View>
-          <T variant="title">{t.checkin.question}</T>
+          <Image
+            source={STATE_ART[state]}
+            resizeMode="contain"
+            accessibilityLabel={t.states[state]}
+            style={styles.scene}
+          />
+          <T style={[styles.question, { color: c.ink }]}>{t.checkin.question}</T>
           <T variant="small" tone="faint" style={{ marginTop: space.xs }}>
             {t.checkin.hint}
           </T>
@@ -42,6 +55,8 @@ export default function Checkin() {
             onChangeText={setName}
             autoFocus
             accessibilityLabel={t.checkin.question}
+            placeholder={t.checkin.placeholder}
+            placeholderTextColor={c.inkFaint}
             returnKeyType="next"
             onSubmitEditing={() => next(true)}
             style={[styles.input, { color: c.ink, borderBottomColor: c.hairline }]}
@@ -58,8 +73,9 @@ export default function Checkin() {
 }
 
 const styles = StyleSheet.create({
-  body: { flex: 1, justifyContent: 'center' },
-  scene: { alignItems: 'center', marginBottom: space.xl },
+  body: { flex: 1, justifyContent: 'flex-end', paddingBottom: space.sm },
+  scene: { width: 132, height: 132, alignSelf: 'center', marginBottom: space.lg },
+  question: { fontFamily: fonts.serif, fontSize: 34, lineHeight: 38, letterSpacing: -0.3 },
   input: {
     fontFamily: fonts.serif,
     fontSize: 22,

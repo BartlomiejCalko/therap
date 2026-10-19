@@ -1,12 +1,11 @@
 import { CourierPrime_400Regular } from '@expo-google-fonts/courier-prime';
 import { Inter_400Regular, Inter_500Medium } from '@expo-google-fonts/inter';
 import {
-  Newsreader_300Light,
-  Newsreader_300Light_Italic,
-  Newsreader_400Regular,
-  Newsreader_400Regular_Italic,
-  Newsreader_500Medium,
-} from '@expo-google-fonts/newsreader';
+  CormorantGaramond_400Regular_Italic,
+  CormorantGaramond_500Medium,
+  CormorantGaramond_500Medium_Italic,
+  CormorantGaramond_600SemiBold,
+} from '@expo-google-fonts/cormorant-garamond';
 import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -32,11 +31,10 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    Newsreader_300Light,
-    Newsreader_300Light_Italic,
-    Newsreader_400Regular,
-    Newsreader_400Regular_Italic,
-    Newsreader_500Medium,
+    CormorantGaramond_400Regular_Italic,
+    CormorantGaramond_500Medium,
+    CormorantGaramond_500Medium_Italic,
+    CormorantGaramond_600SemiBold,
     Inter_400Regular,
     Inter_500Medium,
     CourierPrime_400Regular,
