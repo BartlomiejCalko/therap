@@ -1,7 +1,9 @@
-// Design tokens. Warm paper + sumi ink, one vermilion accent used sparingly.
+// Design tokens. Watercolour light: a night sky of washed indigo in dark mode, a milky dawn in
+// light mode; ink in warm cream or aubergine, and one thread of gold for what is precious.
 
 export type Palette = {
   bg: string;
+  // Cards and sheets are glass: translucent, so the living background breathes through them.
   surface: string;
   surfaceAlt: string;
   ink: string;
@@ -12,47 +14,65 @@ export type Palette = {
   onInk: string;
   scrim: string;
   shadow: string;
-  // Tonal paper for cards — the text-only answer to Cosmos's image grid.
+  // Tinted glass for the four sessions.
   tones: [string, string, string, string];
-  // Four washed-out pastels, used sparingly on Today.
+  // Four watercolour washes, one per state of mind.
   pastel: { peach: string; lavender: string; sage: string; mist: string };
   // Soft surface laid over pastel cards (for small round buttons).
   veil: string;
+  // The thread of gold: hairlines, sparks, the sun.
+  gold: string;
+  // The living background: sky gradient (top, middle, bottom), three drifting stains, and the
+  // colour of the stars (night) or dust (dawn).
+  sky: [string, string, string];
+  stains: [string, string, string];
+  star: string;
+  // How strongly the watercolour painting shows through the sky.
+  paintOpacity: number;
 };
 
 export const palettes: Record<'light' | 'dark', Palette> = {
   light: {
-    bg: '#F3F1EC',
-    surface: '#FBFAF7',
-    surfaceAlt: '#E8E5DE',
-    // A warm charcoal rather than near-black, so dark elements sit on the paper instead of punching through it.
-    ink: '#2E2B27',
-    inkSoft: '#625E57',
-    inkFaint: '#9C988F',
-    hairline: 'rgba(27,26,24,0.12)',
-    accent: '#B5462F',
-    onInk: '#F3F1EC',
-    scrim: 'rgba(20,19,17,0.28)',
-    shadow: '#3A352C',
-    tones: ['#FBFAF7', '#ECE8E0', '#E3E6E0', '#E7E4EA'],
-    pastel: { peach: '#F4E5DA', lavender: '#E8E4F2', sage: '#E1E9DE', mist: '#DDE7EE' },
+    bg: '#F3EEF1',
+    surface: 'rgba(255,252,250,0.74)',
+    surfaceAlt: 'rgba(236,228,238,0.9)',
+    ink: '#2B2438',
+    inkSoft: '#5E556E',
+    inkFaint: '#998FA8',
+    hairline: 'rgba(43,36,56,0.12)',
+    accent: '#C0643F',
+    onInk: '#F7F2F4',
+    scrim: 'rgba(32,24,44,0.3)',
+    shadow: '#3B2D4F',
+    tones: ['rgba(248,229,216,0.78)', 'rgba(230,222,246,0.78)', 'rgba(222,236,226,0.78)', 'rgba(219,230,243,0.78)'],
+    pastel: { peach: '#F5E2D6', lavender: '#E6DEF4', sage: '#DDEADF', mist: '#D9E5F1' },
     veil: 'rgba(255,255,255,0.6)',
+    gold: '#B58A45',
+    sky: ['#F6F0EC', '#EFE6F2', '#F4ECEE'],
+    stains: ['rgba(206,182,236,0.55)', 'rgba(246,200,176,0.5)', 'rgba(188,214,232,0.45)'],
+    star: '#C9A15C',
+    paintOpacity: 0.42,
   },
   dark: {
-    bg: '#121110',
-    surface: '#1C1B19',
-    surfaceAlt: '#282623',
-    ink: '#ECE8E0',
-    inkSoft: '#A7A299',
-    inkFaint: '#6F6B64',
-    hairline: 'rgba(236,232,224,0.12)',
-    accent: '#D26A50',
-    onInk: '#121110',
-    scrim: 'rgba(0,0,0,0.5)',
+    bg: '#0D0A18',
+    surface: 'rgba(33,27,54,0.62)',
+    surfaceAlt: 'rgba(255,255,255,0.08)',
+    ink: '#F3EDE5',
+    inkSoft: '#BBB1CC',
+    inkFaint: '#978DAE',
+    hairline: 'rgba(243,237,229,0.13)',
+    accent: '#E58A66',
+    onInk: '#120E20',
+    scrim: 'rgba(5,3,12,0.62)',
     shadow: '#000000',
-    tones: ['#1C1B19', '#23211E', '#1D201D', '#211F24'],
-    pastel: { peach: '#2A2320', lavender: '#24222C', sage: '#1F2620', mist: '#1D2429' },
-    veil: 'rgba(255,255,255,0.07)',
+    tones: ['rgba(78,48,52,0.58)', 'rgba(60,48,98,0.58)', 'rgba(40,60,50,0.58)', 'rgba(36,52,78,0.58)'],
+    pastel: { peach: '#3B2B2E', lavender: '#2F2850', sage: '#243429', mist: '#22324A' },
+    veil: 'rgba(255,255,255,0.08)',
+    gold: '#E4BF7A',
+    sky: ['#0B0816', '#191032', '#0E0B1C'],
+    stains: ['rgba(122,92,214,0.42)', 'rgba(214,128,150,0.26)', 'rgba(72,118,196,0.32)'],
+    star: '#F6EBD7',
+    paintOpacity: 0.26,
   },
 };
 
@@ -85,5 +105,5 @@ export const radius = {
   button: 14,
 } as const;
 
-// Leaves room for the floating pill tab bar.
+// Leaves room for the docked glass tab bar.
 export const TAB_BAR_SPACE = 120;

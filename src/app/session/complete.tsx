@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -13,6 +13,7 @@ import Animated, {
 import { scheduleOnRN } from 'react-native-worklets';
 
 import { toneFor } from '@/components/Cards';
+import { atmosphere } from '@/components/Atmosphere';
 import { Enso } from '@/components/Enso';
 import { Glyph } from '@/components/Glyph';
 import { Dissolve } from '@/components/motion';
@@ -54,6 +55,7 @@ export default function Complete() {
     done();
     if (session) releaseSession(session.id);
     setChoice('released');
+    atmosphere.burst();
   };
 
   const pan = Gesture.Pan()
@@ -76,6 +78,12 @@ export default function Complete() {
     transform: [{ translateY: y.value }, { scale: 1 + y.value / 2600 }],
   }));
   const cardPaper = useAnimatedStyle(() => ({ opacity: paper.value }));
+
+  // The ensō closes, and a little gold rises from it.
+  useEffect(() => {
+    const id = setTimeout(() => atmosphere.burst(undefined, 170), 2100);
+    return () => clearTimeout(id);
+  }, []);
 
   if (!session) return null;
   const goHome = () => router.dismissTo('/');
@@ -127,7 +135,10 @@ export default function Complete() {
                 kind="secondary"
                 grow
                 disabled={dissolving}
-                onPress={() => setChoice('kept')}
+                onPress={() => {
+                  setChoice('kept');
+                  atmosphere.burst();
+                }}
               />
               <PillButton title={t.complete.letGo} grow disabled={dissolving} onPress={letGo} />
             </View>

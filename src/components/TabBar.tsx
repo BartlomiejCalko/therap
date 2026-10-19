@@ -65,7 +65,7 @@ export function TabBar({ state, navigation, insets }: BottomTabBarProps) {
         pointerEvents="none"
         style={[
           styles.lens,
-          { width: lensWidth, backgroundColor: scheme === 'dark' ? 'rgba(255,255,255,0.09)' : 'rgba(27,26,24,0.06)' },
+          { width: lensWidth, backgroundColor: scheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(43,36,56,0.06)' },
           lens,
         ]}
       />
@@ -109,7 +109,7 @@ export function TabBar({ state, navigation, insets }: BottomTabBarProps) {
           <View
             style={[
               StyleSheet.absoluteFill,
-              { backgroundColor: scheme === 'dark' ? 'rgba(20,19,17,0.6)' : 'rgba(246,244,239,0.7)' },
+              { backgroundColor: scheme === 'dark' ? 'rgba(13,10,24,0.74)' : 'rgba(247,241,245,0.76)' },
             ]}
           />
           {content}
@@ -182,7 +182,7 @@ function TabItem({
             </Animated.Text>
           </Animated.View>
           <Animated.View style={[StyleSheet.absoluteFill, styles.stack, activeLayer]}>
-            {glyph(c.ink)}
+            {glyph(center ? c.gold : c.ink)}
             <Animated.Text numberOfLines={1} style={[styles.label, { color: c.ink }]}>
               {label}
             </Animated.Text>

@@ -22,8 +22,8 @@ type Variant =
 type Tone = 'ink' | 'soft' | 'faint' | 'accent' | 'onInk';
 
 const variants: Record<Variant, TextStyle> = {
-  display: { fontFamily: fonts.serifLight, fontSize: 38, lineHeight: 44, letterSpacing: -0.6 },
-  title: { fontFamily: fonts.serifLight, fontSize: 30, lineHeight: 36, letterSpacing: -0.4 },
+  display: { fontFamily: fonts.serifLight, fontSize: 42, lineHeight: 47, letterSpacing: -0.8 },
+  title: { fontFamily: fonts.serifLight, fontSize: 32, lineHeight: 38, letterSpacing: -0.5 },
   heading: { fontFamily: fonts.serif, fontSize: 22, lineHeight: 28, letterSpacing: -0.2 },
   serif: { fontFamily: fonts.serif, fontSize: 19, lineHeight: 28 },
   serifSmall: { fontFamily: fonts.serif, fontSize: 16, lineHeight: 23 },
@@ -41,7 +41,7 @@ const variants: Record<Variant, TextStyle> = {
     fontFamily: fonts.sansMedium,
     fontSize: 10.5,
     lineHeight: 14,
-    letterSpacing: 1.6,
+    letterSpacing: 2.2,
     textTransform: 'uppercase',
   },
 };

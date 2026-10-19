@@ -1,6 +1,8 @@
 import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { atmosphere } from '@/components/Atmosphere';
 import { T } from '@/components/T';
 import { CircleButton, PillButton, Screen, TopBar } from '@/components/ui';
 import { useT } from '@/i18n';
@@ -9,6 +11,12 @@ import { fonts, space } from '@/theme/tokens';
 export default function Affirmation() {
   const t = useT();
   const { checkinId } = useLocalSearchParams<{ checkinId?: string }>();
+
+  // The reassurance arrives with a quiet scatter of gold, just above the words.
+  useEffect(() => {
+    const id = setTimeout(() => atmosphere.burst(), 350);
+    return () => clearTimeout(id);
+  }, []);
 
   return (
     <Screen scroll={false} edges={['top', 'bottom']}>

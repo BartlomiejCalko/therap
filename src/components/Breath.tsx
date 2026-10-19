@@ -7,6 +7,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 
 import { type BreathPattern } from '@/content/copy';
 import { useT } from '@/i18n';
@@ -78,6 +79,8 @@ export function BreathCircle({
           { borderRadius: size / 2, borderWidth: StyleSheet.hairlineWidth, borderColor: c.hairline },
         ]}
       />
+      {/* A small moon of light that fills and empties with the breath: a golden glow inside a
+          fine gold rim. */}
       <Animated.View
         style={[
           {
@@ -85,13 +88,29 @@ export function BreathCircle({
             width: size,
             height: size,
             borderRadius: size / 2,
-            backgroundColor: c.surfaceAlt,
             borderWidth: 1,
-            borderColor: c.inkFaint,
+            borderColor: c.gold,
+            overflow: 'hidden',
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: c.gold,
+            shadowOpacity: 0.55,
+            shadowRadius: 28,
+            shadowOffset: { width: 0, height: 0 },
           },
           animated,
-        ]}
-      />
+        ]}>
+        <Svg width={size} height={size}>
+          <Defs>
+            <RadialGradient id="breath-moon" cx="50%" cy="45%" r="60%">
+              <Stop offset="0" stopColor={c.gold} stopOpacity={0.55} />
+              <Stop offset="0.6" stopColor={c.stains[0]} stopOpacity={0.35} />
+              <Stop offset="1" stopColor={c.gold} stopOpacity={0.08} />
+            </RadialGradient>
+          </Defs>
+          <Circle cx={size / 2} cy={size / 2} r={size / 2} fill="url(#breath-moon)" />
+        </Svg>
+      </Animated.View>
       <T variant="italic" tone={phase ? 'ink' : 'soft'} center style={{ fontSize: 22 }}>
         {phase ? t.breath.phases[phase.kind] : (idleLabel ?? t.breath.idle)}
       </T>

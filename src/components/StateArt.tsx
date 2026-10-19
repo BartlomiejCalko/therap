@@ -1,6 +1,16 @@
 // Small ink drawings for Today: one picture per state of mind, and the session banner.
 // Drawn in code so they follow the theme; each is a single quiet idea on washed-out paper.
-import Svg, { Circle, Defs, Line, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
+import { useEffect } from 'react';
+import Animated, {
+  Easing,
+  cancelAnimation,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
+import Svg, { Circle, Defs, Line, LinearGradient, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import type { CheckinState } from '@/content/copy';
 import type { Palette } from '@/theme/tokens';
@@ -76,5 +86,36 @@ export function SessionBanner({ c, width, height }: { c: Palette; width: number;
       </Defs>
       <Rect x={0} y={0} width={width} height={height} fill="url(#banner-dawn)" />
     </Svg>
+  );
+}
+
+// A soft orb of light that breathes: a radial glow in one colour, brightest at its heart.
+// Used behind the state watercolours and as the sun on the session card.
+export function Orb({ size, color, glow = 1 }: { size: number; color: string; glow?: number }) {
+  const breath = useSharedValue(0);
+  const reduced = useReducedMotion();
+  useEffect(() => {
+    if (reduced) return;
+    breath.value = withRepeat(withTiming(1, { duration: 3600, easing: Easing.inOut(Easing.sin) }), -1, true);
+    return () => cancelAnimation(breath);
+  }, [reduced, breath]);
+  const style = useAnimatedStyle(() => ({
+    opacity: 0.75 + 0.25 * breath.value,
+    transform: [{ scale: 0.94 + 0.08 * breath.value }],
+  }));
+  const id = `orb-${size}-${color.replace(/[^a-z0-9]/gi, '')}`;
+  return (
+    <Animated.View style={[{ width: size, height: size }, style]}>
+      <Svg width={size} height={size}>
+        <Defs>
+          <RadialGradient id={id} cx="50%" cy="50%" r="50%">
+            <Stop offset="0" stopColor={color} stopOpacity={glow} />
+            <Stop offset="0.45" stopColor={color} stopOpacity={glow * 0.55} />
+            <Stop offset="1" stopColor={color} stopOpacity={0} />
+          </RadialGradient>
+        </Defs>
+        <Circle cx={size / 2} cy={size / 2} r={size / 2} fill={`url(#${id})`} />
+      </Svg>
+    </Animated.View>
   );
 }

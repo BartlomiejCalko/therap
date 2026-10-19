@@ -4,6 +4,7 @@ import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated'
 import { StyleSheet, TextInput, View } from 'react-native';
 
 import { CaptureCard, estimateCapture } from '@/components/Cards';
+import { atmosphere } from '@/components/Atmosphere';
 import { Glyph } from '@/components/Glyph';
 import { T } from '@/components/T';
 import { Chip, Masonry, PillButton, Screen, SectionLabel, Sheet } from '@/components/ui';
@@ -38,6 +39,8 @@ export default function CaptureTab() {
     addCapture(draft);
     setDraft('');
     done();
+    // The thought is caught: a small scatter of gold where it was written.
+    atmosphere.burst(undefined, 230);
     setSavedFlash(true);
     setTimeout(() => setSavedFlash(false), 1800);
   };

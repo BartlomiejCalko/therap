@@ -13,6 +13,7 @@ import { toneFor } from './Cards';
 import { Icon } from './Icon';
 import { InkPress } from './motion';
 import { SessionMark } from './SessionMark';
+import { Orb } from './StateArt';
 import { T } from './T';
 import { TextLink } from './ui';
 
@@ -66,8 +67,12 @@ export function ChooseSession({ ctx }: { ctx: FlowContext }) {
                 beginSession(s.id, ctx, data.settings);
               }}
               style={[styles.tile, { backgroundColor: toneFor(c, s.id) }]}>
+              {/* A soft glow in the session's colour, where light would gather on wet paper. */}
+              <View pointerEvents="none" style={styles.tileGlow}>
+                <Orb size={200} color={c.gold} glow={0.32} />
+              </View>
               <View style={styles.tileTop}>
-                <SessionMark type={s.id} size={34} color={c.inkSoft} />
+                <SessionMark type={s.id} size={34} color={c.gold} />
                 <T variant="small" tone="soft">
                   {t.common.minutes(s.minutes)}
                 </T>
@@ -107,7 +112,15 @@ const styles = StyleSheet.create({
     padding: space.md,
   },
   list: { gap: 12, marginTop: space.lg },
-  tile: { borderRadius: radius.card, paddingVertical: 18, paddingHorizontal: 22 },
+  tile: {
+    borderRadius: 26,
+    paddingVertical: 18,
+    paddingHorizontal: 22,
+    overflow: 'hidden',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.12)',
+  },
+  tileGlow: { position: 'absolute', right: -60, top: -70 },
   tileTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   tileBottom: { flexDirection: 'row', alignItems: 'flex-end', gap: space.md, marginTop: 4 },
 });

@@ -121,6 +121,9 @@ export const en = {
   today: {
     subtitle: 'Your thoughts have somewhere to go.',
     question: "What's on your mind right now?",
+    // The same question set in two voices: upright, then the italic accent.
+    questionLead: "What's on your mind",
+    questionAccent: 'right now?',
     chooseSession: 'Choose a session',
     chooseSessionHint: 'Straight to writing',
     chooseSessionLine: 'Four lengths of quiet, from 5 to 50 minutes. Pick one and empty your head onto the page.',

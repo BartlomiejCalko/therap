@@ -137,6 +137,8 @@ export const pl: Dict = {
   today: {
     subtitle: 'Twoje myśli mają dokąd pójść.',
     question: 'Co masz teraz w głowie?',
+    questionLead: 'Co masz teraz',
+    questionAccent: 'w głowie?',
     chooseSession: 'Wybierz sesję',
     chooseSessionHint: 'Od razu do pisania',
     chooseSessionLine: 'Cztery długości ciszy, od 5 do 50 minut. Wybierz jedną i przelej myśli na kartkę.',

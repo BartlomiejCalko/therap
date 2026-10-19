@@ -18,7 +18,7 @@ import { useTheme } from '@/theme/theme';
 import { radius, space, TAB_BAR_SPACE } from '@/theme/tokens';
 
 import { Icon, type IconName } from './Icon';
-import { PaperTexture } from './PaperTexture';
+import { Atmosphere, atmosphere } from './Atmosphere';
 import { T } from './T';
 
 // ---------- Layout ----------
@@ -36,6 +36,7 @@ export function Screen({
   children: ReactNode;
   scroll?: boolean;
   withTabBar?: boolean;
+  // Kept for older call sites; every screen now has the living sky behind it.
   texture?: boolean;
   // Stays put above the scrolling content.
   header?: ReactNode;
@@ -45,8 +46,12 @@ export function Screen({
   const { c } = useTheme();
   const bottom = withTabBar ? TAB_BAR_SPACE : space.xl;
   return (
-    <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: c.bg }}>
-      {texture && <PaperTexture />}
+    <SafeAreaView
+      edges={edges}
+      style={{ flex: 1, backgroundColor: c.bg }}
+      // Every touch leaves a ring of light in the sky; it only watches, never takes the touch.
+      onTouchStart={(e) => atmosphere.tap(e.nativeEvent.pageX, e.nativeEvent.pageY)}>
+      <Atmosphere />
       {header}
       {scroll ? (
         <ScrollView
