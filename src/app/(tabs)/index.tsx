@@ -19,6 +19,9 @@ import { useTheme } from '@/theme/theme';
 import { fonts, radius, space } from '@/theme/tokens';
 
 const GRID_GAP = 12;
+// The glass behind the four state cards. Switched off for now (the paintings stand straight on
+// the sky); set to true to bring it back in both light and dark mode.
+const STATE_CARD_BACKGROUND = false;
 
 export default function Today() {
   const { c } = useTheme();
@@ -83,7 +86,12 @@ export default function Today() {
                 tap();
                 router.push({ pathname: '/checkin', params: { state } });
               }}
-              style={[styles.tile, { backgroundColor: c.surface, borderColor: c.hairline }]}>
+              style={[
+                styles.tile,
+                STATE_CARD_BACKGROUND
+                  ? { backgroundColor: c.surface, borderColor: c.hairline }
+                  : { backgroundColor: 'transparent', borderColor: 'transparent' },
+              ]}>
               <View style={styles.tileArt}>
                 <View style={StyleSheet.absoluteFill}>
                   <Orb size={tile - 24} color={stateTone(c, state)} glow={0.85} still />
