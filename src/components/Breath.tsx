@@ -93,10 +93,6 @@ export function BreathCircle({
             overflow: 'hidden',
             alignItems: 'center',
             justifyContent: 'center',
-            shadowColor: c.gold,
-            shadowOpacity: 0.55,
-            shadowRadius: 28,
-            shadowOffset: { width: 0, height: 0 },
           },
           animated,
         ]}>

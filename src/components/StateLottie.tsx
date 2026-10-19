@@ -1,9 +1,10 @@
 import LottieView, { type AnimationObject } from 'lottie-react-native';
 import { useEffect, useRef } from 'react';
-import { View, type StyleProp, type ViewStyle } from 'react-native';
-import { useReducedMotion } from 'react-native-reanimated';
+import { type StyleProp, type ViewStyle } from 'react-native';
+import Animated, { useReducedMotion } from 'react-native-reanimated';
 
 import type { CheckinState } from '@/content/copy';
+import { useSettled } from '@/lib/useSettled';
 
 // The four states of mind as living watercolours: each a short loop painted for the app.
 const SOURCES: Record<CheckinState, AnimationObject> = {
@@ -13,6 +14,9 @@ const SOURCES: Record<CheckinState, AnimationObject> = {
   weighing: require('@/assets/lottie/04-cos-mi-ciazy.json'),
 };
 
+// The painting is built together with its screen (before the transition starts, never in the
+// middle of it) and shown still; it starts to move once the transition is over, and rests again
+// when the screen is left. One picture throughout, so its colours never change under the eye.
 export function StateLottie({
   state,
   size,
@@ -28,7 +32,8 @@ export function StateLottie({
 }) {
   const ref = useRef<LottieView>(null);
   const reduced = useReducedMotion();
-  const play = playing && !reduced;
+  const settled = useSettled();
+  const play = playing && settled && !reduced;
 
   useEffect(() => {
     if (play) ref.current?.play();
@@ -36,16 +41,16 @@ export function StateLottie({
   }, [play]);
 
   return (
-    <View pointerEvents="none" style={[{ width: size, height: size }, style]}>
+    <Animated.View pointerEvents="none" style={[{ width: size, height: size }, style]}>
       <LottieView
         ref={ref}
         source={SOURCES[state]}
-        autoPlay={play}
+        autoPlay={false}
         loop
         speed={speed}
         resizeMode="contain"
         style={{ width: size, height: size }}
       />
-    </View>
+    </Animated.View>
   );
 }

@@ -1,7 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useRef, useState } from 'react';
+import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native';
 
 import { T } from '@/components/T';
 import { Orb, stateTone } from '@/components/StateArt';
@@ -13,8 +12,8 @@ import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
 import { fonts, space } from '@/theme/tokens';
 
-const SCENE = 190;
-const SMALL = 104;
+// Where the painting's heart sits, measured from the top of the content (just under the status bar).
+const ART_CENTER = 138;
 
 export default function Checkin() {
   const { c } = useTheme();
@@ -22,26 +21,12 @@ export default function Checkin() {
   const { addCheckin } = useStore();
   const { state } = useLocalSearchParams<{ state: CheckinState }>();
   const [name, setName] = useState('');
+  const input = useRef<TextInput>(null);
 
-  // With the keyboard up there is less room: the watercolour steps back to a smaller size so the
-  // field never crowds the buttons.
-  const scale = useSharedValue(1);
-  useEffect(() => {
-    const show = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', () => {
-      scale.value = withTiming(SMALL / SCENE, { duration: 260 });
-    });
-    const hide = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', () => {
-      scale.value = withTiming(1, { duration: 260 });
-    });
-    return () => {
-      show.remove();
-      hide.remove();
-    };
-  }, [scale]);
-  const sceneStyle = useAnimatedStyle(() => ({
-    height: SCENE * scale.value,
-    transform: [{ scale: scale.value }],
-  }));
+  const { width } = useWindowDimensions();
+  // Large: the painting fills the top of the screen, under the transparent bar and slightly
+  // behind the question if it needs to.
+  const art = Math.min(width * 0.98, 420);
 
   const next = (withName: boolean) => {
     const checkinId = addCheckin(state, withName ? name : undefined);
@@ -51,23 +36,32 @@ export default function Checkin() {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Screen scroll={false} edges={['top', 'bottom']}>
+        {/* The painting sits behind everything, from under the bar down towards the question. */}
+        <View
+          pointerEvents="none"
+          accessibilityRole="image"
+          accessibilityLabel={t.states[state]}
+          style={[styles.art, { top: ART_CENTER - art / 2, height: art }]}>
+          <View style={styles.artGlow}>
+            <Orb size={art * 0.95} color={stateTone(c, state)} glow={0.85} still />
+          </View>
+          <StateLottie state={state} size={art} />
+        </View>
+
         <TopBar left={<CircleButton icon="back" label={t.common.back} onPress={() => router.back()} />} />
 
-        {/* Everything is on screen at once; only the living watercolour above the question moves. */}
         <View style={styles.body}>
-          <Animated.View style={[styles.scene, sceneStyle]} accessibilityRole="image" accessibilityLabel={t.states[state]}>
-            <View style={styles.sceneGlow}>
-              <Orb size={SCENE * 1.25} color={stateTone(c, state)} glow={0.9} />
-            </View>
-            <StateLottie state={state} size={SCENE} />
-          </Animated.View>
           <T variant="title">{t.checkin.question}</T>
           <T variant="small" tone="faint" style={{ marginTop: space.xs }}>
             {t.checkin.hint}
           </T>
           <TextInput
             value={name}
+            ref={input}
             onChangeText={setName}
+            // The keyboard opens together with the screen, so the question arrives already resting
+            // on it. The screen's heavy work (sky, painting) waits until after the slide, which is
+            // what keeps the two moving together smoothly.
             autoFocus
             accessibilityLabel={t.checkin.question}
             returnKeyType="next"
@@ -88,8 +82,8 @@ export default function Checkin() {
 const styles = StyleSheet.create({
   // Anchored to the bottom, so the field always keeps its distance from the buttons below.
   body: { flex: 1, justifyContent: 'flex-end', paddingBottom: space.sm, overflow: 'hidden' },
-  scene: { alignItems: 'center', justifyContent: 'center', marginBottom: space.lg },
-  sceneGlow: { position: 'absolute' },
+  art: { position: 'absolute', left: 0, right: 0, alignItems: 'center', justifyContent: 'center' },
+  artGlow: { position: 'absolute' },
   input: {
     fontFamily: fonts.serif,
     fontSize: 22,

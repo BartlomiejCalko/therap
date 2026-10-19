@@ -91,21 +91,33 @@ export function SessionBanner({ c, width, height }: { c: Palette; width: number;
 
 // A soft orb of light that breathes: a radial glow in one colour, brightest at its heart.
 // Used behind the state watercolours and as the sun on the session card.
-export function Orb({ size, color, glow = 1 }: { size: number; color: string; glow?: number }) {
+export function Orb({
+  size,
+  color,
+  glow = 1,
+  still = false,
+}: {
+  size: number;
+  color: string;
+  glow?: number;
+  // A still glow, where something beside it already moves.
+  still?: boolean;
+}) {
   const breath = useSharedValue(0);
   const reduced = useReducedMotion();
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || still) return;
     breath.value = withRepeat(withTiming(1, { duration: 3600, easing: Easing.inOut(Easing.sin) }), -1, true);
     return () => cancelAnimation(breath);
-  }, [reduced, breath]);
+  }, [reduced, still, breath]);
   const style = useAnimatedStyle(() => ({
     opacity: 0.75 + 0.25 * breath.value,
     transform: [{ scale: 0.94 + 0.08 * breath.value }],
   }));
   const id = `orb-${size}-${color.replace(/[^a-z0-9]/gi, '')}`;
   return (
-    <Animated.View style={[{ width: size, height: size }, style]}>
+    // Drawn once and breathed as a picture: only its scale and opacity change.
+    <Animated.View shouldRasterizeIOS renderToHardwareTextureAndroid style={[{ width: size, height: size }, style]}>
       <Svg width={size} height={size}>
         <Defs>
           <RadialGradient id={id} cx="50%" cy="50%" r="50%">

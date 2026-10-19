@@ -441,11 +441,12 @@ export default function Write() {
                       // field is a plain textarea and shows the text in the current face.
                       {...(Platform.OS === 'web' ? { value: text } : { children: pieces })}
                       onChangeText={onChange}
+                      // The keyboard opens with the page, unless the first-time settings come first.
+                      autoFocus={!settingsOpen}
                       onSelectionChange={(e) => {
                         caret.current = e.nativeEvent.selection.end;
                       }}
                       multiline
-                      autoFocus={!settingsOpen}
                       editable={!closed}
                       scrollEnabled={false}
                       textAlignVertical="top"

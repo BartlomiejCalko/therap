@@ -22,6 +22,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { atmosphere } from './Atmosphere';
 import { T } from './T';
 
 type TextProps = { variant?: Parameters<typeof T>[0]['variant']; tone?: Parameters<typeof T>[0]['tone']; style?: StyleProp<TextStyle> };
@@ -216,6 +217,11 @@ export function InkPress({
         onLayout={(e) => setSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
         onPressIn={down}
         onPressOut={up}
+        onPress={(e) => {
+          // A real tap (not the start of a scroll) leaves a ring of light in the sky.
+          atmosphere.tap(e.nativeEvent.pageX, e.nativeEvent.pageY);
+          props.onPress?.(e);
+        }}
         style={[style, styles.clip, containerStyle ? styles.fill : null]}>
         <Animated.View
           pointerEvents="none"

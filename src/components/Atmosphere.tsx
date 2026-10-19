@@ -2,9 +2,9 @@
 // drifts slowly, three soft stains of colour wander, stars twinkle at night and gold dust rises
 // at dawn. Touches leave a ring of light; moments that matter (saving a thought, choosing a
 // state, finishing a session) scatter a few sparks of gold.
-import { useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useFocusEffect } from "expo-router";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Image, StyleSheet, View, useWindowDimensions } from "react-native";
 import Animated, {
   Easing,
   cancelAnimation,
@@ -15,22 +15,32 @@ import Animated, {
   withRepeat,
   withSequence,
   withTiming,
-} from 'react-native-reanimated';
-import Svg, { Circle, Defs, LinearGradient, RadialGradient, Rect, Stop } from 'react-native-svg';
+} from "react-native-reanimated";
+import Svg, {
+  Circle,
+  Defs,
+  LinearGradient,
+  RadialGradient,
+  Rect,
+  Stop,
+} from "react-native-svg";
 
-import { useTheme } from '@/theme/theme';
+import { useSettled } from "@/lib/useSettled";
+import { useTheme } from "@/theme/theme";
 
-const PAINTING = require('@/assets/backgrounds/watercolor.jpg');
+const PAINTING = require("@/assets/backgrounds/watercolor.jpg");
 
 // ---------- Events ----------
 
-type AtmosEvent = { kind: 'tap' | 'burst'; x?: number; y?: number };
+type AtmosEvent = { kind: "tap" | "burst"; x?: number; y?: number };
 const listeners = new Set<(e: AtmosEvent) => void>();
 
 // Lets any part of the app make the sky react. Only the screen in view is listening.
 export const atmosphere = {
-  tap: (x: number, y: number) => listeners.forEach((l) => l({ kind: 'tap', x, y })),
-  burst: (x?: number, y?: number) => listeners.forEach((l) => l({ kind: 'burst', x, y })),
+  tap: (x: number, y: number) =>
+    listeners.forEach((l) => l({ kind: "tap", x, y })),
+  burst: (x?: number, y?: number) =>
+    listeners.forEach((l) => l({ kind: "burst", x, y })),
 };
 
 // ---------- Helpers ----------
@@ -44,7 +54,10 @@ function seeded(seed: number) {
   };
 }
 
-const slow = (ms: number) => ({ duration: ms, easing: Easing.inOut(Easing.sin) });
+const slow = (ms: number) => ({
+  duration: ms,
+  easing: Easing.inOut(Easing.sin),
+});
 
 // ---------- Layers ----------
 
@@ -57,11 +70,19 @@ function Painting({ active, opacity }: { active: boolean; opacity: number }) {
     return () => cancelAnimation(t);
   }, [active, reduced, t]);
   const style = useAnimatedStyle(() => ({
-    transform: [{ scale: 1.12 + t.value * 0.06 }, { translateY: -14 + t.value * 28 }, { rotate: `${-1 + t.value * 2}deg` }],
+    transform: [
+      { scale: 1.12 + t.value * 0.06 },
+      { translateY: -14 + t.value * 28 },
+      { rotate: `${-1 + t.value * 2}deg` },
+    ],
   }));
   return (
     <Animated.View style={[StyleSheet.absoluteFill, style]}>
-      <Image source={PAINTING} resizeMode="cover" style={[StyleSheet.absoluteFill, { opacity }]} />
+      <Image
+        source={PAINTING}
+        resizeMode="cover"
+        style={[StyleSheet.absoluteFill, { opacity }]}
+      />
     </Animated.View>
   );
 }
@@ -98,7 +119,15 @@ function Stain({
     ],
   }));
   return (
-    <Animated.View style={[{ position: 'absolute', left: 0, top: 0, width: size, height: size }, style]}>
+    <Animated.View
+      // Drawn once and moved as a picture: the gradient never changes, only its place.
+      shouldRasterizeIOS
+      renderToHardwareTextureAndroid
+      style={[
+        { position: "absolute", left: 0, top: 0, width: size, height: size },
+        style,
+      ]}
+    >
       <Svg width={size} height={size}>
         <Defs>
           <RadialGradient id={id} cx="50%" cy="50%" r="50%">
@@ -142,30 +171,52 @@ function Mote({
       return;
     }
     t.value = rise
-      ? withDelay(delay, withRepeat(withTiming(1, { duration: period * 3, easing: Easing.linear }), -1, false))
-      : withDelay(delay, withRepeat(withSequence(withTiming(1, slow(period)), withTiming(0, slow(period))), -1, false));
+      ? withDelay(
+          delay,
+          withRepeat(
+            withTiming(1, { duration: period * 3, easing: Easing.linear }),
+            -1,
+            false,
+          ),
+        )
+      : withDelay(
+          delay,
+          withRepeat(
+            withSequence(
+              withTiming(1, slow(period)),
+              withTiming(0, slow(period)),
+            ),
+            -1,
+            false,
+          ),
+        );
     return () => cancelAnimation(t);
   }, [active, reduced, rise, delay, period, t]);
   const style = useAnimatedStyle(() =>
     rise
-      ? { opacity: Math.sin(t.value * Math.PI) * 0.8, transform: [{ translateY: -60 * t.value }, { translateX: 8 * Math.sin(t.value * 6) }] }
-      : { opacity: 0.15 + 0.85 * t.value, transform: [{ scale: 0.7 + 0.5 * t.value }] },
+      ? {
+          opacity: Math.sin(t.value * Math.PI) * 0.8,
+          transform: [
+            { translateY: -60 * t.value },
+            { translateX: 8 * Math.sin(t.value * 6) },
+          ],
+        }
+      : {
+          opacity: 0.15 + 0.85 * t.value,
+          transform: [{ scale: 0.7 + 0.5 * t.value }],
+        },
   );
   return (
     <Animated.View
       style={[
         {
-          position: 'absolute',
+          position: "absolute",
           left: x - r,
           top: y - r,
           width: r * 2,
           height: r * 2,
           borderRadius: r,
           backgroundColor: color,
-          shadowColor: color,
-          shadowOpacity: 0.9,
-          shadowRadius: r * 3,
-          shadowOffset: { width: 0, height: 0 },
         },
         style,
       ]}
@@ -175,17 +226,42 @@ function Mote({
 
 // ---------- Reactions ----------
 
-type Spark = { id: number; kind: 'tap' | 'burst'; x: number; y: number };
+type Spark = { id: number; kind: "tap" | "burst"; x: number; y: number };
 
-function Ripple({ x, y, color, big }: { x: number; y: number; color: string; big: boolean }) {
+function Ripple({
+  x,
+  y,
+  color,
+  big,
+}: {
+  x: number;
+  y: number;
+  color: string;
+  big: boolean;
+}) {
   const t = useSharedValue(0);
   useEffect(() => {
-    t.value = withTiming(1, { duration: big ? 1200 : 900, easing: Easing.out(Easing.cubic) });
+    t.value = withTiming(1, {
+      duration: big ? 1200 : 900,
+      easing: Easing.out(Easing.cubic),
+    });
   }, [big, t]);
   const size = big ? 260 : 150;
-  const glow = useAnimatedStyle(() => ({ opacity: 0.55 * (1 - t.value), transform: [{ scale: 0.25 + t.value * 0.95 }] }));
-  const ring = useAnimatedStyle(() => ({ opacity: 0.9 * (1 - t.value), transform: [{ scale: 0.15 + t.value * 0.85 }] }));
-  const box = { position: 'absolute' as const, left: x - size / 2, top: y - size / 2, width: size, height: size };
+  const glow = useAnimatedStyle(() => ({
+    opacity: 0.55 * (1 - t.value),
+    transform: [{ scale: 0.25 + t.value * 0.95 }],
+  }));
+  const ring = useAnimatedStyle(() => ({
+    opacity: 0.9 * (1 - t.value),
+    transform: [{ scale: 0.15 + t.value * 0.85 }],
+  }));
+  const box = {
+    position: "absolute" as const,
+    left: x - size / 2,
+    top: y - size / 2,
+    width: size,
+    height: size,
+  };
   return (
     <>
       <Animated.View style={[box, glow]}>
@@ -196,10 +272,21 @@ function Ripple({ x, y, color, big }: { x: number; y: number; color: string; big
               <Stop offset="1" stopColor={color} stopOpacity={0} />
             </RadialGradient>
           </Defs>
-          <Circle cx={size / 2} cy={size / 2} r={size / 2} fill={`url(#glow-${x}-${y})`} />
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={size / 2}
+            fill={`url(#glow-${x}-${y})`}
+          />
         </Svg>
       </Animated.View>
-      <Animated.View style={[box, { borderRadius: size / 2, borderWidth: 1, borderColor: color }, ring]} />
+      <Animated.View
+        style={[
+          box,
+          { borderRadius: size / 2, borderWidth: 1, borderColor: color },
+          ring,
+        ]}
+      />
     </>
   );
 }
@@ -222,10 +309,27 @@ function Burst({ x, y, color }: { x: number; y: number; color: string }) {
   );
 }
 
-function SparkDot({ x, y, angle, dist, r, color }: { x: number; y: number; angle: number; dist: number; r: number; color: string }) {
+function SparkDot({
+  x,
+  y,
+  angle,
+  dist,
+  r,
+  color,
+}: {
+  x: number;
+  y: number;
+  angle: number;
+  dist: number;
+  r: number;
+  color: string;
+}) {
   const t = useSharedValue(0);
   useEffect(() => {
-    t.value = withTiming(1, { duration: 1100, easing: Easing.out(Easing.quad) });
+    t.value = withTiming(1, {
+      duration: 1100,
+      easing: Easing.out(Easing.quad),
+    });
   }, [t]);
   const style = useAnimatedStyle(() => ({
     opacity: t.value < 0.15 ? t.value / 0.15 : 1 - (t.value - 0.15) / 0.85,
@@ -239,7 +343,7 @@ function SparkDot({ x, y, angle, dist, r, color }: { x: number; y: number; angle
     <Animated.View
       style={[
         {
-          position: 'absolute',
+          position: "absolute",
           left: x - r,
           top: y - r,
           width: r * 2,
@@ -257,37 +361,84 @@ function SparkDot({ x, y, angle, dist, r, color }: { x: number; y: number; angle
   );
 }
 
-// ---------- The sky ----------
+// ---------- Reactions ----------
 
-export function Atmosphere() {
+// Rings and sparks live in their own layer with their own state, so a touch never makes the
+// whole sky draw itself again.
+function Reactions({ listening }: { listening: boolean }) {
   const { c, scheme } = useTheme();
   const { width, height } = useWindowDimensions();
-  const [active, setActive] = useState(false);
   const [sparks, setSparks] = useState<Spark[]>([]);
   const nextId = useRef(0);
-  const night = scheme === 'dark';
+  const night = scheme === "dark";
 
-  // Only the screen in view keeps its sky moving and listens for touches.
+  useEffect(() => {
+    if (!listening) return;
+    const listen = (e: AtmosEvent) => {
+      const id = nextId.current++;
+      const spark: Spark = {
+        id,
+        kind: e.kind,
+        x: e.x ?? width / 2,
+        y: e.y ?? height * 0.42,
+      };
+      setSparks((s) => [...s.slice(-5), spark]);
+      setTimeout(() => setSparks((s) => s.filter((x) => x.id !== id)), 1400);
+    };
+    listeners.add(listen);
+    return () => {
+      listeners.delete(listen);
+    };
+  }, [listening, width, height]);
+
+  return (
+    <>
+      {sparks.map((s) =>
+        s.kind === "burst" ? (
+          <View key={s.id} style={StyleSheet.absoluteFill}>
+            <Ripple x={s.x} y={s.y} color={c.gold} big />
+            <Burst x={s.x} y={s.y} color={c.gold} />
+          </View>
+        ) : (
+          <Ripple
+            key={s.id}
+            x={s.x}
+            y={s.y}
+            color={night ? c.star : c.gold}
+            big={false}
+          />
+        ),
+      )}
+    </>
+  );
+}
+
+// ---------- The sky ----------
+
+export const Atmosphere = memo(function Atmosphere() {
+  const { c, scheme } = useTheme();
+  const { width, height } = useWindowDimensions();
+  const night = scheme === "dark";
+  // Moving only once a screen transition is over, and still until the next one has finished:
+  // the slide between screens never competes with the sky.
+  const active = useSettled();
+  // The screen in view listens for touches straight away.
+  const [listening, setListening] = useState(false);
   useFocusEffect(
     useCallback(() => {
-      setActive(true);
-      const listen = (e: AtmosEvent) => {
-        const id = nextId.current++;
-        const spark: Spark = { id, kind: e.kind, x: e.x ?? width / 2, y: e.y ?? height * 0.42 };
-        setSparks((s) => [...s.slice(-5), spark]);
-        setTimeout(() => setSparks((s) => s.filter((x) => x.id !== id)), 1400);
-      };
-      listeners.add(listen);
-      return () => {
-        listeners.delete(listen);
-        setActive(false);
-      };
-    }, [width, height]),
+      setListening(true);
+      return () => setListening(false);
+    }, []),
   );
+  // Stars are mounted once the first transition has finished, not during it.
+  const [starsReady, setStarsReady] = useState(false);
+  useEffect(() => {
+    if (active) setStarsReady(true);
+  }, [active]);
 
   const motes = useMemo(() => {
     const rand = seeded(night ? 7 : 11);
-    return Array.from({ length: night ? 34 : 18 }, (_, i) => ({
+    return Array.from({ length: night ? 16 : 10 }, (_, i) => ({
       key: i,
       x: rand() * width,
       y: rand() * height,
@@ -301,34 +452,59 @@ export function Atmosphere() {
 
   return (
     // Clipped to the screen: the painting is drawn larger than it so it can drift.
-    <View pointerEvents="none" style={[StyleSheet.absoluteFill, { overflow: 'hidden' }]}>
-      <Svg width={width} height={height} style={StyleSheet.absoluteFill}>
-        <Defs>
-          <LinearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor={c.sky[0]} />
-            <Stop offset="0.55" stopColor={c.sky[1]} />
-            <Stop offset="1" stopColor={c.sky[2]} />
-          </LinearGradient>
-        </Defs>
-        <Rect x={0} y={0} width={width} height={height} fill="url(#sky)" />
-      </Svg>
+    <View
+      pointerEvents="none"
+      style={[StyleSheet.absoluteFill, { overflow: "hidden" }]}
+    >
+      <View
+        shouldRasterizeIOS
+        renderToHardwareTextureAndroid
+        style={StyleSheet.absoluteFill}
+      >
+        <Svg width={width} height={height} style={StyleSheet.absoluteFill}>
+          <Defs>
+            <LinearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0" stopColor={c.sky[0]} />
+              <Stop offset="0.55" stopColor={c.sky[1]} />
+              <Stop offset="1" stopColor={c.sky[2]} />
+            </LinearGradient>
+          </Defs>
+          <Rect x={0} y={0} width={width} height={height} fill="url(#sky)" />
+        </Svg>
+      </View>
       <Painting active={active} opacity={c.paintOpacity} />
-      <Stain id="stain-a" color={c.stains[0]} size={stain} from={[-stain * 0.45, -stain * 0.3]} to={[-stain * 0.2, -stain * 0.12]} duration={19000} active={active} />
-      <Stain id="stain-b" color={c.stains[1]} size={stain * 0.8} from={[width - stain * 0.5, height * 0.35]} to={[width - stain * 0.7, height * 0.2]} duration={23000} active={active} />
-      <Stain id="stain-c" color={c.stains[2]} size={stain * 0.9} from={[-stain * 0.3, height - stain * 0.45]} to={[-stain * 0.05, height - stain * 0.6]} duration={27000} active={active} />
-      {motes.map(({ key, ...m }) => (
-        <Mote key={key} {...m} color={c.star} rise={!night} active={active} />
-      ))}
-      {sparks.map((s) =>
-        s.kind === 'burst' ? (
-          <View key={s.id} style={StyleSheet.absoluteFill}>
-            <Ripple x={s.x} y={s.y} color={c.gold} big />
-            <Burst x={s.x} y={s.y} color={c.gold} />
-          </View>
-        ) : (
-          <Ripple key={s.id} x={s.x} y={s.y} color={night ? c.star : c.gold} big={false} />
-        ),
-      )}
+      <Stain
+        id="stain-a"
+        color={c.stains[0]}
+        size={stain}
+        from={[-stain * 0.45, -stain * 0.3]}
+        to={[-stain * 0.2, -stain * 0.12]}
+        duration={19000}
+        active={active}
+      />
+      <Stain
+        id="stain-b"
+        color={c.stains[1]}
+        size={stain * 0.8}
+        from={[width - stain * 0.5, height * 0.35]}
+        to={[width - stain * 0.7, height * 0.2]}
+        duration={23000}
+        active={active}
+      />
+      <Stain
+        id="stain-c"
+        color={c.stains[2]}
+        size={stain * 0.9}
+        from={[-stain * 0.3, height - stain * 0.45]}
+        to={[-stain * 0.05, height - stain * 0.6]}
+        duration={27000}
+        active={active}
+      />
+      {starsReady &&
+        motes.map(({ key, ...m }) => (
+          <Mote key={key} {...m} color={c.star} rise={!night} active={active} />
+        ))}
+      <Reactions listening={listening} />
     </View>
   );
-}
+});

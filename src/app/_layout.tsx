@@ -87,6 +87,9 @@ function Root({ fontsLoaded }: { fontsLoaded: boolean }) {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="welcome" options={{ animation: 'fade' }} />
           <Stack.Screen name="affirmation" options={{ animation: 'none' }} />
+          {/* A soft fade: the keyboard opens with this screen, and a sideways slide would show the
+              question riding up on it. */}
+          <Stack.Screen name="checkin" options={{ animation: 'fade', animationDuration: 260 }} />
           <Stack.Screen name="how-to-write" options={{ presentation: 'modal' }} />
           <Stack.Screen name="session/write" options={{ gestureEnabled: false, animation: 'fade' }} />
           <Stack.Screen name="session/ground" options={{ animation: 'fade' }} />

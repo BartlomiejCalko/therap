@@ -86,7 +86,7 @@ export default function Today() {
               style={[styles.tile, { backgroundColor: c.surface, borderColor: c.hairline }]}>
               <View style={styles.tileArt}>
                 <View style={StyleSheet.absoluteFill}>
-                  <Orb size={tile - 24} color={stateTone(c, state)} glow={0.85} />
+                  <Orb size={tile - 24} color={stateTone(c, state)} glow={0.85} still />
                 </View>
                 <StateLottie state={state} size={tile - 24} />
               </View>
