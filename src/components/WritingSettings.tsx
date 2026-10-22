@@ -48,15 +48,15 @@ function FontTiles({ value, onPick }: { value: WritingFont; onPick: (font: Writi
             style={({ pressed }) => [
               styles.font,
               {
-                backgroundColor: selected ? c.ink : c.surface,
-                borderColor: selected ? c.ink : c.hairline,
+                backgroundColor: selected ? c.primary : c.surface,
+                borderColor: selected ? c.primaryEdge : c.hairline,
                 opacity: pressed ? 0.75 : 1,
               },
             ]}>
-            <T style={{ fontFamily: WRITING_FONTS[f].family, fontSize: 24, lineHeight: 30, color: selected ? c.onInk : c.ink }}>
+            <T style={{ fontFamily: WRITING_FONTS[f].family, fontSize: 24, lineHeight: 30, color: selected ? c.onPrimary : c.ink }}>
               Aa
             </T>
-            <T variant="small" style={{ color: selected ? c.onInk : c.inkSoft }} numberOfLines={1}>
+            <T variant="small" style={{ color: selected ? c.onPrimary : c.inkSoft }} numberOfLines={1}>
               {t.write.fonts[f]}
             </T>
           </Pressable>

@@ -35,8 +35,8 @@ export function SessionTile({
         tap();
         onPress();
       }}
-      style={[styles.tile, { width, backgroundColor: toneFor(c, session.type) }]}>
-      <SessionMark type={session.type} size={26} />
+      style={[styles.tile, { width, backgroundColor: toneFor(c, session.type), borderColor: c.hairline }]}>
+      <SessionMark type={session.type} size={26} color={c.session[session.type]} />
       <View style={{ flex: 1, marginTop: space.md }}>
         {session.released ? (
           <T variant="italic" tone="soft" style={{ fontSize: 16, lineHeight: 22 }}>
@@ -73,7 +73,7 @@ export function CaptureCard({ capture, onMore }: { capture: Capture; onMore: () 
       style={[styles.capture, { backgroundColor: explored ? c.bg : c.surface, borderColor: c.hairline }]}>
       <View style={styles.captureTop}>
         <T variant="label">{timeOfDay(capture.createdAt)}</T>
-        <Icon name="more" size={18} color={c.inkFaint} />
+        <Icon name="more" size={18} color={c.accent} />
       </View>
       <T variant="typeSmall" tone={explored ? 'soft' : 'ink'} style={{ marginTop: space.sm }}>
         {capture.text}
@@ -85,10 +85,10 @@ export function CaptureCard({ capture, onMore }: { capture: Capture; onMore: () 
         </View>
       ) : (
         <View style={styles.status}>
-          <T variant="medium" style={{ fontSize: 13 }}>
+          <T variant="medium" style={{ fontSize: 13, color: c.accentText }}>
             {t.capture.unloadThis}
           </T>
-          <Icon name="arrow" size={14} />
+          <Icon name="arrow" size={14} color={c.accentText} />
         </View>
       )}
     </InkPress>
@@ -99,7 +99,7 @@ export function CaptureCard({ capture, onMore }: { capture: Capture; onMore: () 
 export const estimateCapture = (capture: Capture) => 90 + Math.ceil(capture.text.length / 16) * 21;
 
 const styles = StyleSheet.create({
-  tile: { height: 200, borderRadius: radius.card, padding: 14 },
+  tile: { height: 200, borderRadius: radius.card, padding: 14, borderWidth: StyleSheet.hairlineWidth },
   capture: { borderRadius: radius.card, padding: 14, borderWidth: StyleSheet.hairlineWidth },
   captureTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   status: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: space.md },

@@ -18,7 +18,7 @@ import { useTheme } from '@/theme/theme';
 import { fonts, radius, space, TAB_BAR_SPACE } from '@/theme/tokens';
 
 import { Icon, type IconName } from './Icon';
-import { PaperTexture } from './PaperTexture';
+import { Wall } from './Hall';
 import { T } from './T';
 
 // ---------- Layout ----------
@@ -27,7 +27,7 @@ export function Screen({
   children,
   scroll = true,
   withTabBar = false,
-  texture = false,
+  texture = true,
   header,
   contentStyle,
   edges = ['top'],
@@ -36,6 +36,7 @@ export function Screen({
   children: ReactNode;
   scroll?: boolean;
   withTabBar?: boolean;
+  // The lamp-lit wall behind the content.
   texture?: boolean;
   // Stays put above the scrolling content.
   header?: ReactNode;
@@ -46,7 +47,7 @@ export function Screen({
   const bottom = withTabBar ? TAB_BAR_SPACE : space.xl;
   return (
     <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: c.bg }}>
-      {texture && <PaperTexture />}
+      {texture && <Wall />}
       {header}
       {scroll ? (
         <ScrollView
@@ -121,11 +122,13 @@ export function CircleButton({
           borderRadius: size / 2,
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: filled ? c.ink : c.surface,
+          backgroundColor: filled ? c.primary : c.surface,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: filled ? c.primaryEdge : c.frame,
           opacity: pressed ? 0.6 : 1,
         },
       ]}>
-      <Icon name={icon} size={size * 0.48} color={color ?? (filled ? c.onInk : c.ink)} />
+      <Icon name={icon} size={size * 0.46} color={color ?? (filled ? c.onPrimary : c.ink)} />
     </Pressable>
   );
 }
@@ -147,7 +150,7 @@ export function PillButton({
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
   grow?: boolean;
-  // A colour for the primary button other than the forest green (a session's own tint at night).
+  // A colour for the primary button other than the velvet green.
   tint?: string;
 }) {
   const { c } = useTheme();
@@ -163,13 +166,19 @@ export function PillButton({
       }}
       style={({ pressed }) => [
         styles.pill,
-        primary && { backgroundColor: tint ?? c.primary },
-        kind === 'secondary' && { borderWidth: 1, borderColor: c.hairline, backgroundColor: c.surface },
+        primary && {
+          backgroundColor: tint ?? (pressed ? c.primaryPressed : c.primary),
+          borderColor: c.primaryEdge,
+          shadowColor: c.shadow,
+        },
+        primary && styles.pillPrimary,
+        kind === 'secondary' && { borderWidth: StyleSheet.hairlineWidth, borderColor: c.frame, backgroundColor: c.surface },
         kind === 'ghost' && { paddingHorizontal: space.md },
         // The label stays centred; the arrow sits at the far edge, as in the reference designs.
         icon && styles.pillWithIcon,
         grow && { flex: 1 },
-        { opacity: disabled ? 0.35 : pressed ? 0.8 : 1 },
+        { opacity: disabled ? 0.38 : pressed && !primary ? 0.7 : 1 },
+        pressed && { transform: [{ scale: 0.985 }] },
         style,
       ]}>
       <T style={[styles.pillLabel, { color: fg }, !primary && styles.pillLabelQuiet]}>{title}</T>
@@ -206,12 +215,12 @@ export function Chip({
         styles.chip,
         size === 'sm' && { height: 30, paddingHorizontal: 12 },
         {
-          backgroundColor: selected ? c.ink : c.surface,
-          borderColor: selected ? c.ink : c.hairline,
+          backgroundColor: selected ? c.primary : c.surface,
+          borderColor: selected ? c.primaryEdge : c.hairline,
           opacity: pressed ? 0.7 : 1,
         },
       ]}>
-      <T variant={size === 'sm' ? 'small' : 'body'} style={{ color: selected ? c.onInk : c.ink }}>
+      <T variant={size === 'sm' ? 'small' : 'body'} style={{ color: selected ? c.onPrimary : c.ink }}>
         {label}
       </T>
     </Pressable>
@@ -228,10 +237,10 @@ export function TextLink({ title, onPress, arrow = true }: { title: string; onPr
         onPress();
       }}
       style={({ pressed }) => [styles.link, { opacity: pressed ? 0.5 : 1 }]}>
-      <T variant="medium" style={{ textDecorationLine: 'underline', textDecorationColor: c.hairline }}>
+      <T variant="medium" style={{ textDecorationLine: 'underline', textDecorationColor: c.frame }}>
         {title}
       </T>
-      {arrow && <Icon name="arrow" size={15} />}
+      {arrow && <Icon name="arrow" size={15} color={c.accentText} />}
     </Pressable>
   );
 }
@@ -257,9 +266,9 @@ export function Toggle({ value, onChange, label }: { value: boolean; onChange: (
       }}
       style={[
         styles.toggle,
-        { backgroundColor: value ? c.ink : c.surfaceAlt, borderColor: value ? c.ink : c.hairline },
+        { backgroundColor: value ? c.primary : c.surfaceAlt, borderColor: value ? c.primaryEdge : c.hairline },
       ]}>
-      <Animated.View style={[styles.knob, { backgroundColor: value ? c.onInk : c.surface }, knob]} />
+      <Animated.View style={[styles.knob, { backgroundColor: value ? c.onPrimary : c.inkFaint }, knob]} />
     </Pressable>
   );
 }
@@ -275,7 +284,7 @@ export function Segmented<K extends string>({
 }) {
   const { c } = useTheme();
   return (
-    <View style={[styles.segmented, { backgroundColor: c.surfaceAlt }]}>
+    <View style={[styles.segmented, { backgroundColor: c.surfaceAlt, borderColor: c.hairline }]}>
       {items.map((item) => {
         const active = item.key === value;
         return (
@@ -287,8 +296,8 @@ export function Segmented<K extends string>({
               tap();
               onChange(item.key);
             }}
-            style={[styles.segment, active && { backgroundColor: c.ink }]}>
-            <T variant="small" style={{ color: active ? c.onInk : c.inkSoft, fontFamily: 'Inter_500Medium' }}>
+            style={[styles.segment, active && { backgroundColor: c.primary }]}>
+            <T variant="small" style={{ color: active ? c.onPrimary : c.inkSoft, fontFamily: fonts.sansMedium }}>
               {item.label}
             </T>
           </Pressable>
@@ -323,7 +332,7 @@ export function Row({
           </T>
         ) : null}
       </View>
-      {right ?? (onPress ? <Icon name="arrow" size={16} color={c.inkFaint} /> : null)}
+      {right ?? (onPress ? <Icon name="arrow" size={16} color={c.accent} /> : null)}
     </View>
   );
   return (
@@ -361,9 +370,14 @@ export function Sheet({
       <View
         style={[
           styles.sheet,
-          { backgroundColor: c.bg, paddingBottom: insets.bottom + space.lg, shadowColor: c.shadow },
+          {
+            backgroundColor: c.bg,
+            borderColor: c.frame,
+            paddingBottom: insets.bottom + space.lg,
+            shadowColor: c.shadow,
+          },
         ]}>
-        <View style={[styles.handle, { backgroundColor: c.hairline }]} />
+        <View style={[styles.handle, { backgroundColor: c.frame }]} />
         {title ? (
           <T variant="heading" center style={{ marginBottom: space.lg }}>
             {title}
@@ -435,10 +449,17 @@ const styles = StyleSheet.create({
     marginTop: space.xl,
     marginBottom: space.md,
   },
-  pillLabel: { fontFamily: fonts.serif, fontSize: 20, lineHeight: 24, letterSpacing: 0.1 },
+  pillLabel: { fontFamily: fonts.serifMedium, fontSize: 20, lineHeight: 24, letterSpacing: 0.3 },
   pillLabelQuiet: { fontFamily: fonts.sansMedium, fontSize: 15, lineHeight: 20 },
   pillWithIcon: { paddingHorizontal: 56 },
   pillIcon: { position: 'absolute', right: 22, top: 0, bottom: 0, justifyContent: 'center' },
+  pillPrimary: {
+    borderWidth: StyleSheet.hairlineWidth,
+    shadowOpacity: 0.22,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
+  },
   pill: {
     height: 56,
     borderRadius: radius.button,
@@ -466,7 +487,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   knob: { width: 20, height: 20, borderRadius: 10 },
-  segmented: { flexDirection: 'row', borderRadius: radius.pill, padding: 3, alignSelf: 'center' },
+  segmented: {
+    flexDirection: 'row',
+    borderRadius: radius.pill,
+    borderWidth: StyleSheet.hairlineWidth,
+    padding: 3,
+    alignSelf: 'center',
+  },
   segment: { paddingHorizontal: 14, height: 32, borderRadius: radius.pill, justifyContent: 'center' },
   row: {
     flexDirection: 'row',
@@ -480,8 +507,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    borderTopWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: space.gutter,
     paddingTop: 10,
     shadowOpacity: 0.15,

@@ -42,13 +42,13 @@ const variants: Record<Variant, TextStyle> = {
     fontFamily: fonts.sansMedium,
     fontSize: 11,
     lineHeight: 15,
-    letterSpacing: 2.6,
+    letterSpacing: 2.8,
     textTransform: 'uppercase',
   },
 };
 
 const toneColor = (c: Palette, tone: Tone) =>
-  ({ ink: c.ink, soft: c.inkSoft, faint: c.inkFaint, accent: c.accent, onInk: c.onInk })[tone];
+  ({ ink: c.ink, soft: c.inkSoft, faint: c.inkFaint, accent: c.accentText, onInk: c.onInk })[tone];
 
 export function T({
   variant = 'body',
@@ -58,7 +58,8 @@ export function T({
   ...props
 }: TextProps & { variant?: Variant; tone?: Tone; center?: boolean }) {
   const { c } = useTheme();
-  const defaultTone: Tone = variant === 'label' ? 'faint' : 'ink';
+  // Labels are engraved in brass, like the plates in a library.
+  const defaultTone: Tone = variant === 'label' ? 'accent' : 'ink';
   return (
     <Text
       {...props}

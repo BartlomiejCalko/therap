@@ -85,7 +85,7 @@ export default function CaptureTab() {
 
       {groups.length === 0 ? (
         <View style={{ alignItems: 'center', marginTop: space.xl, gap: space.md }}>
-          <Glyph name="cloud" size={64} color={c.inkFaint} />
+          <Glyph name="cloud" size={64} color={c.gold} />
           <T variant="italic" tone="faint" center style={{ fontSize: 17 }}>
             {t.capture.empty}
           </T>

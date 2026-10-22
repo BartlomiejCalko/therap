@@ -18,14 +18,6 @@ export const SESSION_ART: Record<SessionType, { light: ImageSourcePropType; dark
   },
 };
 
-// At night the main button takes the colour of the session's painting.
-export const SESSION_TINT: Record<SessionType, string> = {
-  pause: '#8C6C66',
-  clarity: '#5D6B5E',
-  space: '#6B6190',
-  release: '#56677C',
-};
-
 // The four states of mind as small watercolours on transparent paper.
 export const STATE_ART: Record<CheckinState, ImageSourcePropType> = {
   'too-much': require('@/assets/states/01-za-duzo-naraz.png'),

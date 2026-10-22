@@ -51,7 +51,7 @@ const pickIndex = (length: number, not?: number | null) => {
 const LINE = 32;
 const HEADER_HEIGHT = 60;
 // The extra time, past the session's length.
-const OVERTIME = { light: '#4F8A4B', dark: '#8DBB87' };
+const OVERTIME = { light: '#3F6148', dark: '#9DB49A' };
 // The paper fills the screen; this is where a line of text starts from its edge.
 const COLUMN_INSET = 20;
 
@@ -482,7 +482,7 @@ export default function Write() {
                       <View
                         style={[
                           styles.guideFill,
-                          { width: `${Math.min(1, elapsed / planned) * 100}%`, backgroundColor: c.inkFaint },
+                          { width: `${Math.min(1, elapsed / planned) * 100}%`, backgroundColor: c.gold },
                         ]}
                       />
                     </View>

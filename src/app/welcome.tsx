@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'react-native';
 
 import { Enso } from '@/components/Enso';
+import { Ornament } from '@/components/Hall';
 import { T } from '@/components/T';
 import { FadeIn, PillButton, Screen } from '@/components/ui';
 import { useT } from '@/i18n';
@@ -27,10 +28,11 @@ export default function Welcome() {
         <View style={styles.hero}>
           <Enso size={120} />
           <FadeIn delay={900}>
-            <T variant="display" center style={{ marginTop: space.xl }}>
-              Unload
+            <T center style={[styles.wordmark, { color: c.ink }]}>
+              UNLOAD
             </T>
-            <T variant="italic" tone="soft" center style={{ marginTop: space.sm }}>
+            <Ornament width={150} style={{ marginTop: space.md }} />
+            <T variant="italic" tone="soft" center style={{ marginTop: space.md }}>
               {t.welcome.tagline}
             </T>
           </FadeIn>
@@ -60,6 +62,7 @@ export default function Welcome() {
 const styles = StyleSheet.create({
   wrap: { justifyContent: 'space-between', paddingBottom: space.lg },
   hero: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  wordmark: { fontFamily: fonts.serif, fontSize: 38, lineHeight: 44, letterSpacing: 9, marginTop: space.xl, paddingLeft: 9 },
   input: {
     fontFamily: fonts.serif,
     fontSize: 22,

@@ -17,10 +17,10 @@ import Animated, {
 } from 'react-native-reanimated';
 
 export const MACHINE = {
-  body: '#1A1917',
+  body: '#1A1714',
   bodyText: '#E9E4DA',
   bodyFaint: 'rgba(233,228,218,0.45)',
-  paper: { light: '#F6F2EA', dark: '#23211E' },
+  paper: { light: '#FAF7F3', dark: '#1D2125' },
 };
 
 const RAIL_HEIGHT = 9;

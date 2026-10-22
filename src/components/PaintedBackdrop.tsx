@@ -7,8 +7,11 @@ import type { SessionType } from '@/content/copy';
 import { SESSION_ART } from '@/content/sessionArt';
 import { useTheme } from '@/theme/theme';
 
+import { Wall } from './Hall';
+
 // A watercolour laid across the top of a quiet screen, dissolving into the paper below it, as in
-// the reference designs for check-in, the reassurance and the end of a session.
+// the reference designs for check-in, the reassurance and the end of a session. The screen's
+// wall is laid over it again, lined up with the wall outside, so the painting has no seam.
 export function PaintedBackdrop({
   art,
   height = 0.55,
@@ -44,6 +47,9 @@ export function PaintedBackdrop({
         </Defs>
         <Rect x={0} y={0} width={1} height={1} fill="url(#backdrop-fade)" />
       </Svg>
+      <View style={{ position: 'absolute', top: 0, left: 0, width, height: screen }}>
+        <Wall />
+      </View>
     </View>
   );
 }

@@ -77,7 +77,7 @@ function EmptyNote({ children }: { children: string }) {
   const { c } = useTheme();
   return (
     <View style={{ alignItems: 'center', marginTop: space.xl, gap: space.md }}>
-      <Glyph name="moon" size={56} color={c.inkFaint} />
+      <Glyph name="moon" size={56} color={c.gold} />
       <T variant="italic" tone="faint" center style={{ fontSize: 17 }}>
         {children}
       </T>
@@ -258,7 +258,7 @@ export function MonthView({ sessions, checkins }: { sessions: Session[]; checkin
               </View>
               <View style={styles.dayDots}>
                 {Array.from({ length: Math.min(count, 3) }, (_, k) => (
-                  <View key={k} style={[styles.dayDot, { backgroundColor: c.ink }]} />
+                  <View key={k} style={[styles.dayDot, { backgroundColor: c.gold }]} />
                 ))}
               </View>
             </Pressable>
@@ -342,7 +342,7 @@ export function Insights({
                 </T>
               </View>
               <View style={[styles.barTrack, { backgroundColor: c.hairline }]}>
-                <View style={{ height: 2, width: `${(s.count / maxState) * 100}%`, backgroundColor: c.ink }} />
+                <View style={{ height: 2, width: `${(s.count / maxState) * 100}%`, backgroundColor: c.gold }} />
               </View>
             </View>
           ))}

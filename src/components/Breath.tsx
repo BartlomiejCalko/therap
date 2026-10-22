@@ -75,7 +75,7 @@ export function BreathCircle({
       <View
         style={[
           StyleSheet.absoluteFill,
-          { borderRadius: size / 2, borderWidth: StyleSheet.hairlineWidth, borderColor: c.hairline },
+          { borderRadius: size / 2, borderWidth: StyleSheet.hairlineWidth, borderColor: c.frame },
         ]}
       />
       <Animated.View
@@ -87,7 +87,7 @@ export function BreathCircle({
             borderRadius: size / 2,
             backgroundColor: c.surfaceAlt,
             borderWidth: 1,
-            borderColor: c.inkFaint,
+            borderColor: c.gold,
           },
           animated,
         ]}

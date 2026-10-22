@@ -44,8 +44,8 @@ export function Enso({ size = 150, delay = 200 }: { size?: number; delay?: numbe
     <Svg width={size} height={size} viewBox="0 0 160 160">
       <Path
         d={ENSO}
-        stroke={c.ink}
-        strokeWidth={13}
+        stroke={c.gold}
+        strokeWidth={10}
         strokeLinecap="round"
         fill="none"
         strokeDasharray={`${LENGTH} ${LENGTH}`}
@@ -54,8 +54,8 @@ export function Enso({ size = 150, delay = 200 }: { size?: number; delay?: numbe
       />
       <Path
         d={ENSO}
-        stroke={c.ink}
-        strokeWidth={7}
+        stroke={c.gold}
+        strokeWidth={4.5}
         strokeLinecap="round"
         fill="none"
         strokeDasharray={`${LENGTH} ${LENGTH}`}

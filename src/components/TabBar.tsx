@@ -65,7 +65,7 @@ export function TabBar({ state, navigation, insets }: BottomTabBarProps) {
         pointerEvents="none"
         style={[
           styles.lens,
-          { width: lensWidth, backgroundColor: scheme === 'dark' ? 'rgba(255,255,255,0.09)' : 'rgba(27,26,24,0.06)' },
+          { width: lensWidth, backgroundColor: scheme === 'dark' ? 'rgba(201,166,107,0.11)' : 'rgba(163,129,77,0.10)' },
           lens,
         ]}
       />
@@ -109,13 +109,13 @@ export function TabBar({ state, navigation, insets }: BottomTabBarProps) {
           <View
             style={[
               StyleSheet.absoluteFill,
-              { backgroundColor: scheme === 'dark' ? 'rgba(20,19,17,0.6)' : 'rgba(246,244,239,0.7)' },
+              { backgroundColor: scheme === 'dark' ? 'rgba(20,22,25,0.74)' : 'rgba(241,236,230,0.8)' },
             ]}
           />
           {content}
         </View>
       )}
-      <View pointerEvents="none" style={[styles.edge, { backgroundColor: c.hairline }]} />
+      <View pointerEvents="none" style={[styles.edge, { backgroundColor: c.frame }]} />
     </View>
   );
 }
@@ -173,7 +173,7 @@ function TabItem({
       }}
       style={styles.item}>
       <Animated.View style={[styles.itemInner, scale]}>
-        {/* Two layers, crossfaded, so icon and name ease from faint to ink. */}
+        {/* Two layers, crossfaded, so icon and name ease from faint to brass. */}
         <View>
           <Animated.View style={[styles.stack, idleLayer]}>
             {glyph(c.inkFaint)}
@@ -182,8 +182,8 @@ function TabItem({
             </Animated.Text>
           </Animated.View>
           <Animated.View style={[StyleSheet.absoluteFill, styles.stack, activeLayer]}>
-            {glyph(c.ink)}
-            <Animated.Text numberOfLines={1} style={[styles.label, { color: c.ink }]}>
+            {glyph(c.accentText)}
+            <Animated.Text numberOfLines={1} style={[styles.label, { color: c.accentText }]}>
               {label}
             </Animated.Text>
           </Animated.View>

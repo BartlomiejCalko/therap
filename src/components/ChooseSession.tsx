@@ -7,13 +7,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { SESSIONS, type SessionType } from '@/content/copy';
-import { SESSION_ART, SESSION_TINT } from '@/content/sessionArt';
+import { SESSION_ART } from '@/content/sessionArt';
 import { useT } from '@/i18n';
 import { beginSession, type FlowContext } from '@/lib/flow';
 import { tap } from '@/lib/haptics';
 import { useStore } from '@/store/store';
 import { useTheme } from '@/theme/theme';
-import { fonts, space } from '@/theme/tokens';
+import { fonts, radius, space } from '@/theme/tokens';
 
 import { T } from './T';
 import { CircleButton, PillButton } from './ui';
@@ -85,15 +85,18 @@ export function ChooseSession({
             tap();
             router.push('/settings');
           }}
-          style={({ pressed }) => [styles.avatar, { backgroundColor: c.veil, opacity: pressed ? 0.7 : 1 }]}>
-          <T style={[styles.initial, { color: c.ink }]}>{initial || 'U'}</T>
+          style={({ pressed }) => [
+            styles.avatar,
+            { backgroundColor: c.veil, borderColor: c.frame, opacity: pressed ? 0.7 : 1 },
+          ]}>
+          <T style={[styles.initial, { color: c.accentText }]}>{initial || 'U'}</T>
         </Pressable>
       </View>
 
       {/* Fills the screen to push its content down; its empty part lets touches through. */}
       <View pointerEvents="box-none" style={[styles.body, { paddingBottom: bottomInset + space.md }]}>
         {/* The four sessions as slim painted pills, side by side in a glass bar above the words. */}
-        <View style={[styles.rail, { backgroundColor: c.veil, borderColor: c.hairline }]}>
+        <View style={[styles.rail, { backgroundColor: c.veil, borderColor: c.frame }]}>
           {SESSIONS.map((s) => {
             const on = s.id === selected;
             return (
@@ -131,7 +134,7 @@ export function ChooseSession({
         {/* A fixed height, room enough for the longest session's words, so switching sessions
             never moves the bar above. */}
         <Animated.View key={selected} entering={FadeIn.duration(320)} style={styles.words}>
-          <T variant="label" style={{ color: c.inkSoft }}>
+          <T variant="label">
             {copy.name} · {t.common.minutes(session.minutes)}
           </T>
           <T style={[styles.title, { color: c.ink }]}>{copy.line}</T>
@@ -143,7 +146,6 @@ export function ChooseSession({
         <PillButton
           title={t.choose.pick}
           icon="arrow"
-          tint={dark ? SESSION_TINT[selected] : undefined}
           onPress={() => beginSession(selected, ctx, data.settings)}
           style={{ marginTop: space.lg }}
         />
@@ -163,7 +165,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: space.gutter,
   },
-  avatar: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   initial: { fontFamily: fonts.serif, fontSize: 21, lineHeight: 25 },
   body: { flex: 1, justifyContent: 'flex-end', paddingHorizontal: space.gutter + 4 },
   title: { fontFamily: fonts.serif, fontSize: 40, lineHeight: 43, letterSpacing: -0.5, marginTop: space.sm },
@@ -173,7 +182,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     paddingVertical: 12,
     paddingHorizontal: 6,
-    borderRadius: 26,
+    borderRadius: radius.card + 4,
     borderWidth: StyleSheet.hairlineWidth,
     marginBottom: space.lg,
   },
