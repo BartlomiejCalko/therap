@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View, type TextInputInstance } from 'react-native';
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -107,7 +107,7 @@ export default function Write() {
   const [companionNote, setCompanionNote] = useState<string | null>(null);
   const noteTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const fontOptions = useFontOptions();
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<TextInputInstance>(null);
 
   const [text, setText] = useState('');
   // Which face each part of the text was written in; a face change applies from the caret on.
