@@ -41,7 +41,7 @@ const ICONS: Record<string, { icon: IconName; label: keyof Dict['tabs'] }> = {
 const lensX = (index: number) => PAD + index * ITEM + (ITEM - LENS_WIDTH) / 2;
 
 // Cosmos-style floating pill in glass, with nothing behind it: content scrolls all the way down.
-export function TabBar({ state, navigation, insets }: BottomTabBarProps) {
+export function TabBar({ state, emitter, navigateToTab, insets }: BottomTabBarProps) {
   const { c, scheme } = useTheme();
   const t = useT();
   const reduced = useReducedMotion();
@@ -65,8 +65,8 @@ export function TabBar({ state, navigation, insets }: BottomTabBarProps) {
         center={route.name === 'unload'}
         onPress={() => {
           tap();
-          const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-          if (state.index !== index && !event.defaultPrevented) navigation.navigate(route.name, route.params);
+          const event = emitter.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+          if (state.index !== index && !event.defaultPrevented) navigateToTab(route.key);
         }}
       />
     );
