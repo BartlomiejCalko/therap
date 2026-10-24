@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View, useWindowDimensions, type TextInputInstance } from 'react-native';
 
 import { T } from '@/components/T';
 import { Orb, stateTone } from '@/components/StateArt';
@@ -21,7 +21,7 @@ export default function Checkin() {
   const { addCheckin } = useStore();
   const { state } = useLocalSearchParams<{ state: CheckinState }>();
   const [name, setName] = useState('');
-  const input = useRef<TextInput>(null);
+  const input = useRef<TextInputInstance>(null);
 
   const { width } = useWindowDimensions();
   // Large: the painting fills the top of the screen, under the transparent bar and slightly

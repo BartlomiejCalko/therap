@@ -40,7 +40,7 @@ const ICONS: Record<string, { icon: IconName; label: keyof Dict['tabs'] }> = {
 
 // A glass bar docked to the bottom edge, each icon named underneath.
 // Content still scrolls behind it, softened by the glass.
-export function TabBar({ state, navigation, insets }: BottomTabBarProps) {
+export function TabBar({ state, emitter, navigateToTab, insets }: BottomTabBarProps) {
   const { c, scheme } = useTheme();
   const t = useT();
   const reduced = useReducedMotion();
@@ -82,8 +82,8 @@ export function TabBar({ state, navigation, insets }: BottomTabBarProps) {
               center={route.name === 'unload'}
               onPress={() => {
                 tap();
-                const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-                if (state.index !== index && !event.defaultPrevented) navigation.navigate(route.name, route.params);
+                const event = emitter.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+                if (state.index !== index && !event.defaultPrevented) navigateToTab(route.key);
               }}
             />
           );
